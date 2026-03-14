@@ -1,0 +1,1464 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>PLAYLOG</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+<script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+<script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+<script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+/* ── Y2K Tech Dark System ─────────────────────────────────────────────────── */
+:root {
+  /* Deep space base */
+  --void:    #03050a;
+  --space:   #070b14;
+  --deep:    #0a1020;
+  --panel:   #0d1628;
+  --lift:    #111e38;
+  --raised:  #162544;
+
+  /* Plastic/translucent surfaces */
+  --glass:   rgba(20, 40, 80, 0.55);
+  --glass2:  rgba(30, 55, 110, 0.45);
+  --frost:   rgba(100, 160, 255, 0.07);
+  --frost2:  rgba(100, 160, 255, 0.13);
+
+  /* Text */
+  --text:    #c8deff;
+  --text2:   #7a9acc;
+  --text3:   #3d5a88;
+  --white:   #e8f2ff;
+
+  /* Borders */
+  --b1:      rgba(100,160,255,0.12);
+  --b2:      rgba(100,160,255,0.22);
+  --b3:      rgba(100,160,255,0.38);
+  --bhi:     rgba(100,160,255,0.6);
+
+  /* Accent neons */
+  --cyan:    #00d4ff;
+  --cyan2:   #0094cc;
+  --green:   #00ff9d;
+  --green2:  #00cc7a;
+  --orange:  #ff6b00;
+  --pink:    #ff2d78;
+  --yellow:  #ffe000;
+
+  /* Player colours */
+  --greg-c: #ff6b00; --greg-g: linear-gradient(135deg,#ff6b00,#ff2d78);
+  --anth-c: #bf00ff; --anth-g: linear-gradient(135deg,#bf00ff,#7700cc);
+  --sam-c:  #00d4ff; --sam-g:  linear-gradient(135deg,#00d4ff,#0066ff);
+  --joel-c: #00ff9d; --joel-g: linear-gradient(135deg,#00ff9d,#00cc44);
+
+  --pc: var(--greg-c);
+  --pg: var(--greg-g);
+
+  /* Scan line + plastic texture */
+  --scanline: repeating-linear-gradient(
+    0deg,
+    transparent,
+    transparent 2px,
+    rgba(0,0,0,0.18) 2px,
+    rgba(0,0,0,0.18) 4px
+  );
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  background: var(--void);
+  color: var(--text);
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 16px;
+  font-weight: 400;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* Deep space starfield glow */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background:
+    radial-gradient(ellipse 80% 50% at 20% 10%, rgba(0,100,255,0.06) 0%, transparent 60%),
+    radial-gradient(ellipse 60% 40% at 80% 80%, rgba(0,212,255,0.05) 0%, transparent 50%),
+    radial-gradient(ellipse 40% 30% at 60% 30%, rgba(191,0,255,0.04) 0%, transparent 50%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+#root { position: relative; z-index: 1; max-width: 960px; margin: 0 auto; padding: 0 1.25rem 6rem; }
+
+/* ── HEADER ──────────────────────────────────────────────────────────────── */
+.site-header {
+  padding: 2rem 0 1.5rem;
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 1rem;
+  border-bottom: 1px solid var(--b2);
+  position: relative;
+  margin-bottom: 1.75rem;
+}
+.site-header::after {
+  content: '';
+  position: absolute;
+  bottom: -1px; left: 0;
+  width: 120px; height: 1px;
+  background: var(--pc);
+  box-shadow: 0 0 12px var(--pc);
+}
+.logo-eyebrow {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 9px;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: var(--text3);
+  margin-bottom: 6px;
+}
+.logo {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 3rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  line-height: 1;
+  color: var(--white);
+  text-shadow: 0 0 40px rgba(0,180,255,0.3);
+  position: relative;
+}
+.logo::after {
+  content: 'PLAYLOG';
+  position: absolute;
+  inset: 0;
+  background: var(--pg);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  opacity: 0.85;
+}
+.header-badge { text-align: right; }
+.header-badge-name {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 1rem;
+  letter-spacing: 0.08em;
+  color: var(--pc);
+  text-shadow: 0 0 10px var(--pc);
+  display: block;
+}
+.header-badge-sub {
+  font-size: 10px;
+  font-family: 'Share Tech Mono', monospace;
+  letter-spacing: 0.12em;
+  color: var(--text3);
+}
+
+/* ── PLAYER RAIL ─────────────────────────────────────────────────────────── */
+.player-rail {
+  display: flex;
+  gap: 2px;
+  background: var(--glass);
+  backdrop-filter: blur(16px) saturate(1.5);
+  border: 1px solid var(--b2);
+  border-radius: 8px;
+  padding: 4px;
+  margin-bottom: 2rem;
+  overflow-x: auto;
+  scrollbar-width: none;
+  box-shadow:
+    0 0 0 1px var(--b1) inset,
+    0 4px 24px rgba(0,0,0,0.5),
+    inset 0 1px 0 rgba(255,255,255,0.06);
+  /* plastic scan effect */
+  background-image: var(--scanline);
+  background-color: var(--glass);
+}
+.player-rail::-webkit-scrollbar { display: none; }
+.prail-btn {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  padding: 0.5rem 1.1rem;
+  border-radius: 5px;
+  border: none;
+  background: transparent;
+  color: var(--text3);
+  cursor: pointer;
+  transition: all 0.15s;
+  white-space: nowrap;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  flex-shrink: 0;
+}
+.prail-btn:hover { color: var(--text2); background: var(--frost2); }
+.prail-btn.active {
+  background: var(--pg);
+  color: #fff;
+  box-shadow: 0 0 16px var(--pc), 0 2px 8px rgba(0,0,0,0.4);
+  text-shadow: 0 0 8px rgba(255,255,255,0.4);
+}
+.prail-dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
+.prail-btn:not(.active) .prail-dot { background: var(--text3); }
+.prail-btn.active .prail-dot { background: rgba(255,255,255,0.8); box-shadow: 0 0 4px #fff; }
+
+/* ── STAT CARDS ──────────────────────────────────────────────────────────── */
+.stat-row { display: grid; grid-template-columns: repeat(auto-fit,minmax(100px,1fr)); gap: 6px; margin-bottom: 1.75rem; }
+.stat-card {
+  background: var(--glass);
+  backdrop-filter: blur(16px) saturate(1.4);
+  border: 1px solid var(--b2);
+  border-radius: 6px;
+  padding: 1rem 0.875rem;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.05);
+  background-image: var(--scanline);
+  background-color: var(--glass);
+}
+.stat-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 2px;
+  background: var(--pg);
+  box-shadow: 0 0 8px var(--pc);
+}
+.stat-num {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 2rem;
+  letter-spacing: 0.02em;
+  color: var(--pc);
+  text-shadow: 0 0 16px var(--pc);
+  line-height: 1;
+  margin-bottom: 4px;
+}
+.stat-lbl {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 8px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--text3);
+}
+
+/* ── NAV TABS ────────────────────────────────────────────────────────────── */
+.nav-tabs {
+  display: flex;
+  gap: 2px;
+  background: var(--glass);
+  backdrop-filter: blur(12px);
+  border: 1px solid var(--b2);
+  border-radius: 6px;
+  padding: 3px;
+  margin-bottom: 1.5rem;
+  overflow-x: auto;
+  scrollbar-width: none;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.04);
+  background-image: var(--scanline);
+  background-color: var(--glass);
+}
+.nav-tabs::-webkit-scrollbar { display: none; }
+.nav-tab {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  padding: 0.4rem 0.9rem;
+  border-radius: 4px;
+  border: none;
+  background: transparent;
+  color: var(--text3);
+  cursor: pointer;
+  transition: all 0.15s;
+  white-space: nowrap;
+}
+.nav-tab:hover { color: var(--text2); background: var(--frost); }
+.nav-tab.active {
+  background: var(--pg);
+  color: #fff;
+  font-weight: 700;
+  box-shadow: 0 0 12px var(--pc);
+}
+
+/* ── BUTTONS ─────────────────────────────────────────────────────────────── */
+.btn {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  padding: 0.45rem 1rem;
+  border-radius: 5px;
+  border: 1px solid var(--b2);
+  background: var(--glass);
+  backdrop-filter: blur(8px);
+  color: var(--text2);
+  cursor: pointer;
+  transition: all 0.15s;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  white-space: nowrap;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.04);
+}
+.btn:hover { border-color: var(--b3); color: var(--text); background: var(--frost2); }
+.btn-primary {
+  background: var(--pg);
+  border-color: transparent;
+  color: #fff;
+  font-weight: 700;
+  box-shadow: 0 0 20px var(--pc), 0 4px 16px rgba(0,0,0,0.4);
+  text-shadow: 0 0 8px rgba(255,255,255,0.3);
+}
+.btn-primary:hover { filter: brightness(1.15); transform: translateY(-1px); box-shadow: 0 0 28px var(--pc), 0 6px 20px rgba(0,0,0,0.4); }
+.btn-danger { color: var(--pink); border-color: rgba(255,45,120,0.25); background: rgba(255,45,120,0.06); }
+.btn-danger:hover { background: rgba(255,45,120,0.14); border-color: var(--pink); box-shadow: 0 0 10px rgba(255,45,120,0.3); }
+.btn-sm { padding: 0.25rem 0.6rem; font-size: 10px; }
+.btn-ghost { background: transparent; border-color: transparent; color: var(--text3); box-shadow: none; }
+.btn-ghost:hover { color: var(--text2); background: var(--frost); border-color: transparent; }
+
+/* ── GAME CARD ───────────────────────────────────────────────────────────── */
+.game-card {
+  background: var(--glass);
+  backdrop-filter: blur(16px) saturate(1.3);
+  border: 1px solid var(--b2);
+  border-radius: 8px;
+  overflow: hidden;
+  margin-bottom: 6px;
+  display: flex;
+  min-height: 96px;
+  transition: transform 0.18s, box-shadow 0.18s, border-color 0.18s;
+  box-shadow: 0 2px 16px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.04);
+  background-image: var(--scanline);
+  background-color: var(--glass);
+  position: relative;
+}
+.game-card:hover {
+  transform: translateY(-2px);
+  border-color: var(--b3);
+  box-shadow: 0 0 20px var(--pc), 0 8px 32px rgba(0,0,0,0.5);
+}
+.game-accent { width: 3px; min-width: 3px; background: var(--pg); flex-shrink: 0; box-shadow: 0 0 8px var(--pc); }
+.game-cover { width: 68px; min-width: 68px; background: var(--deep); flex-shrink: 0; overflow: hidden; position: relative; }
+.game-cover img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.game-cover-ph {
+  width: 100%; height: 100%;
+  display: flex; align-items: center; justify-content: center;
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 1.6rem;
+  color: var(--text3);
+  background: linear-gradient(135deg, var(--deep), var(--panel));
+}
+.cover-spin { width: 16px; height: 16px; border: 2px solid var(--b2); border-top-color: var(--cyan); border-radius: 50%; animation: spin 0.7s linear infinite; }
+.game-body { padding: 0.875rem 1rem; flex: 1; min-width: 0; display: flex; flex-direction: column; justify-content: space-between; }
+.game-title {
+  font-family: 'Space Grotesk', sans-serif;
+  font-weight: 700; font-size: 14px; color: var(--white);
+  line-height: 1.2; margin-bottom: 0.4rem; letter-spacing: -0.01em;
+}
+.game-pills { display: flex; gap: 0.3rem; flex-wrap: wrap; margin-bottom: 0.4rem; align-items: center; }
+.pill {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 9px; padding: 0.15rem 0.5rem;
+  border-radius: 3px;
+  background: var(--frost);
+  color: var(--text3);
+  border: 1px solid var(--b1);
+  letter-spacing: 0.05em;
+}
+.pill-playing { background: rgba(255,107,0,0.12); color: var(--orange); border-color: rgba(255,107,0,0.3); text-shadow: 0 0 6px var(--orange); }
+.pill-beaten  { background: rgba(0,255,157,0.1);  color: var(--green);  border-color: rgba(0,255,157,0.3); text-shadow: 0 0 6px var(--green); }
+.pill-backlog { background: var(--frost); color: var(--text3); }
+.pill-dropped { background: rgba(255,45,120,0.1); color: var(--pink); border-color: rgba(255,45,120,0.25); }
+.game-meta {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 10px; color: var(--text3); display: flex; gap: 0.5rem; flex-wrap: wrap; letter-spacing: 0.03em;
+}
+.game-bottom { display: flex; align-items: center; justify-content: space-between; gap: 0.5rem; flex-wrap: wrap; margin-top: 0.4rem; }
+.game-actions { display: flex; gap: 0.3rem; }
+
+/* ── STARS ───────────────────────────────────────────────────────────────── */
+.stars { display: inline-flex; gap: 2px; }
+.star { font-size: 13px; cursor: pointer; transition: transform 0.1s; color: var(--raised); }
+.star:hover { transform: scale(1.35); color: var(--yellow); }
+.star.lit { color: var(--yellow); text-shadow: 0 0 8px var(--yellow); }
+.star-sm { font-size: 11px; }
+
+/* ── MODAL ───────────────────────────────────────────────────────────────── */
+.modal-bg {
+  position: fixed; inset: 0;
+  background: rgba(0,0,0,0.85);
+  display: flex; align-items: center; justify-content: center;
+  padding: 1.5rem 1rem; z-index: 100;
+  backdrop-filter: blur(8px);
+}
+.modal-box {
+  background: var(--glass2);
+  backdrop-filter: blur(24px) saturate(1.5);
+  border: 1px solid var(--b3);
+  border-radius: 10px;
+  padding: 1.75rem 1.5rem;
+  width: 100%; max-width: 500px; max-height: 90vh; overflow-y: auto;
+  box-shadow: 0 0 40px var(--pc), 0 30px 80px rgba(0,0,0,0.7), inset 0 1px 0 rgba(255,255,255,0.08);
+  position: relative;
+  background-image: var(--scanline);
+  background-color: var(--glass2);
+}
+.modal-box::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0; height: 2px;
+  background: var(--pg);
+  box-shadow: 0 0 16px var(--pc);
+  border-radius: 10px 10px 0 0;
+}
+.modal-title {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 1.5rem; font-weight: 700; letter-spacing: -0.02em;
+  color: var(--white); margin-bottom: 1.5rem;
+}
+.modal-close {
+  position: absolute; top: 1.1rem; right: 1.1rem;
+  background: var(--frost); border: 1px solid var(--b2);
+  border-radius: 4px; width: 28px; height: 28px;
+  display: flex; align-items: center; justify-content: center;
+  color: var(--text2); cursor: pointer; transition: all 0.15s; font-size: 0.9rem;
+}
+.modal-close:hover { background: var(--frost2); color: var(--white); border-color: var(--b3); }
+
+/* ── FORM ────────────────────────────────────────────────────────────────── */
+.form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.875rem; }
+.col2 { grid-column: 1/-1; }
+.form-group { display: flex; flex-direction: column; gap: 0.35rem; }
+.form-lbl {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 9px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--text3);
+}
+.form-inp, .form-sel, .form-txta {
+  background: rgba(0,10,30,0.6);
+  border: 1px solid var(--b2);
+  border-radius: 5px;
+  padding: 0.55rem 0.75rem;
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 13px; color: var(--text);
+  outline: none; width: 100%;
+  transition: border-color 0.15s, box-shadow 0.15s;
+  -webkit-appearance: none;
+}
+.form-inp:focus, .form-sel:focus {
+  border-color: var(--pc);
+  box-shadow: 0 0 0 2px rgba(0,180,255,0.12), 0 0 12px var(--pc);
+}
+.form-inp::placeholder { color: var(--text3); }
+.form-sel { cursor: pointer; color-scheme: dark; }
+.form-sel option { background: var(--deep); color: var(--text); }
+.form-txta { resize: none; line-height: 1.6; }
+.modal-actions { display: flex; gap: 0.5rem; justify-content: flex-end; margin-top: 1.5rem; }
+
+/* ── COVER PICKER ────────────────────────────────────────────────────────── */
+.cover-results { display: grid; grid-template-columns: repeat(auto-fill,minmax(76px,1fr)); gap: 0.4rem; margin-top: 0.5rem; max-height: 190px; overflow-y: auto; }
+.cover-opt { border-radius: 5px; overflow: hidden; cursor: pointer; border: 2px solid transparent; transition: all 0.15s; aspect-ratio: 3/4; }
+.cover-opt:hover { border-color: var(--cyan); transform: scale(1.04); box-shadow: 0 0 10px var(--cyan); }
+.cover-opt.sel { border-color: var(--cyan); box-shadow: 0 0 12px var(--cyan); }
+.cover-opt img { width: 100%; height: 100%; object-fit: cover; display: block; }
+
+/* ── YEAR HEADER ─────────────────────────────────────────────────────────── */
+.year-header { display: flex; align-items: center; gap: 1rem; padding: 0.5rem 0 1rem; }
+.year-num {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 3.5rem; letter-spacing: 0.06em;
+  color: var(--pc); text-shadow: 0 0 30px var(--pc);
+  line-height: 1; opacity: 0.9;
+}
+.year-meta { display: flex; flex-direction: column; gap: 3px; }
+.year-meta-main { font-family: 'Space Grotesk', sans-serif; font-weight: 600; font-size: 13px; color: var(--text); }
+.year-meta-sub { font-family: 'Share Tech Mono', monospace; font-size: 10px; color: var(--text3); letter-spacing: 0.05em; }
+.year-line { flex: 1; height: 1px; background: linear-gradient(90deg, var(--b3), transparent); }
+
+/* ── FILTER PILLS ────────────────────────────────────────────────────────── */
+.filter-row { display: flex; gap: 0.35rem; flex-wrap: wrap; margin-bottom: 1.25rem; }
+.fpill {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 10px; letter-spacing: 0.06em;
+  padding: 0.3rem 0.75rem; border-radius: 4px;
+  border: 1px solid var(--b2);
+  background: var(--frost); color: var(--text3);
+  cursor: pointer; transition: all 0.15s;
+}
+.fpill:hover { color: var(--text2); border-color: var(--b3); }
+.fpill.active {
+  background: var(--pg); border-color: transparent;
+  color: #fff; font-weight: 700;
+  box-shadow: 0 0 12px var(--pc);
+}
+
+/* ── TOP RATED ───────────────────────────────────────────────────────────── */
+.top-item {
+  background: var(--glass); backdrop-filter: blur(12px);
+  border: 1px solid var(--b2); border-radius: 7px;
+  padding: 0.875rem 1rem; margin-bottom: 5px;
+  display: flex; align-items: center; gap: 0.875rem;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.35);
+  transition: all 0.15s;
+  background-image: var(--scanline);
+  background-color: var(--glass);
+}
+.top-item:hover { transform: translateX(4px); border-color: var(--b3); box-shadow: 0 0 14px var(--pc); }
+.top-rank {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 1.8rem; width: 2.5rem; flex-shrink: 0;
+  color: var(--text3); line-height: 1;
+}
+.top-rank.gold   { color: var(--yellow); text-shadow: 0 0 14px var(--yellow); }
+.top-rank.silver { color: #c0ccdd; text-shadow: 0 0 8px #c0ccdd; }
+.top-rank.bronze { color: #cc7733; text-shadow: 0 0 8px #cc7733; }
+.top-cover { width: 38px; height: 50px; border-radius: 5px; overflow: hidden; flex-shrink: 0; background: var(--deep); }
+.top-cover img { width: 100%; height: 100%; object-fit: cover; }
+
+/* ── GOTY ────────────────────────────────────────────────────────────────── */
+.goty-hero { text-align: center; padding: 2rem 0 2.5rem; }
+.goty-title {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 3rem; letter-spacing: 0.15em;
+  color: var(--cyan); text-shadow: 0 0 30px var(--cyan), 0 0 60px rgba(0,212,255,0.3);
+  line-height: 1; margin-bottom: 0.5rem;
+}
+.goty-sub {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 10px; letter-spacing: 0.25em; text-transform: uppercase; color: var(--text3);
+}
+.goty-winner {
+  background: var(--glass2); backdrop-filter: blur(20px);
+  border: 1px solid var(--b3); border-radius: 10px;
+  padding: 1.5rem; display: flex; align-items: center; gap: 1.25rem;
+  box-shadow: 0 0 30px rgba(0,212,255,0.1), 0 4px 32px rgba(0,0,0,0.5);
+  margin-bottom: 0.625rem; position: relative; overflow: hidden;
+  background-image: var(--scanline); background-color: var(--glass2);
+}
+.goty-winner::before {
+  content: '';
+  position: absolute; top: 0; left: 0; right: 0; height: 2px;
+  background: linear-gradient(90deg, var(--cyan), var(--pc), var(--green), var(--cyan));
+  background-size: 200% 100%;
+  animation: shimmer 3s linear infinite;
+  box-shadow: 0 0 12px var(--cyan);
+}
+@keyframes shimmer { 0%{background-position:0% 0%} 100%{background-position:200% 0%} }
+.goty-winner-cover { width: 80px; height: 106px; border-radius: 8px; overflow: hidden; flex-shrink: 0; background: var(--deep); box-shadow: 0 0 16px var(--cyan), 0 4px 12px rgba(0,0,0,0.5); }
+.goty-winner-cover img { width: 100%; height: 100%; object-fit: cover; }
+.goty-winner-info { flex: 1; min-width: 0; }
+.goty-crown { font-size: 1.5rem; margin-bottom: 4px; display: block; }
+.goty-winner-title {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 1.5rem; font-weight: 700; letter-spacing: -0.02em;
+  color: var(--white); line-height: 1.1; margin-bottom: 6px;
+}
+.goty-winner-meta { font-family: 'Share Tech Mono', monospace; font-size: 10px; letter-spacing: 0.06em; color: var(--text3); margin-bottom: 8px; }
+.goty-runner {
+  background: var(--glass); backdrop-filter: blur(12px);
+  border: 1px solid var(--b2); border-radius: 7px;
+  padding: 0.75rem 1rem; display: flex; align-items: center; gap: 0.75rem; margin-bottom: 4px;
+  background-image: var(--scanline); background-color: var(--glass);
+}
+.goty-runner-cover { width: 36px; height: 48px; border-radius: 4px; overflow: hidden; flex-shrink: 0; background: var(--deep); }
+.goty-runner-cover img { width: 100%; height: 100%; object-fit: cover; }
+
+/* ── INDIVIDUAL GOTY GRID ────────────────────────────────────────────────── */
+.player-goty-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 0.625rem; margin-bottom: 1.5rem; }
+.player-goty-card {
+  background: var(--glass); backdrop-filter: blur(14px);
+  border: 1px solid var(--b2); border-radius: 8px; padding: 1rem;
+  position: relative; overflow: hidden;
+  background-image: var(--scanline); background-color: var(--glass);
+}
+.player-goty-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px; background: var(--pc2); box-shadow: 0 0 8px var(--pc2); }
+.pgoty-name { font-family: 'Share Tech Mono', monospace; font-size: 1rem; letter-spacing: 0.1em; margin-bottom: 0.75rem; }
+.pgoty-game { display: flex; align-items: center; gap: 0.625rem; }
+.pgoty-cover { width: 36px; height: 48px; border-radius: 4px; overflow: hidden; flex-shrink: 0; background: var(--deep); }
+.pgoty-cover img { width: 100%; height: 100%; object-fit: cover; }
+.pgoty-title { font-family: 'Space Grotesk', sans-serif; font-weight: 600; font-size: 12px; color: var(--white); line-height: 1.2; }
+.pgoty-none { font-family: 'Share Tech Mono', monospace; font-size: 10px; color: var(--text3); }
+
+/* ── COMPARE ─────────────────────────────────────────────────────────────── */
+.cmp-grid { display: grid; grid-template-columns: repeat(auto-fit,minmax(190px,1fr)); gap: 0.625rem; margin-bottom: 2rem; }
+.cmp-card {
+  background: var(--glass); backdrop-filter: blur(14px);
+  border: 1px solid var(--b2); border-radius: 8px; padding: 1.25rem;
+  box-shadow: 0 2px 16px rgba(0,0,0,0.35);
+  position: relative; overflow: hidden;
+  background-image: var(--scanline); background-color: var(--glass);
+}
+.cmp-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px; background: var(--pc2); box-shadow: 0 0 8px var(--pc2); }
+.cmp-name { font-family: 'Share Tech Mono', monospace; font-size: 1rem; letter-spacing: 0.1em; margin-bottom: 1rem; }
+.cmp-row { display: flex; justify-content: space-between; padding: 0.4rem 0; border-bottom: 1px solid var(--b1); font-size: 12px; }
+.cmp-row:last-child { border-bottom: none; }
+.cmp-key { font-family: 'Share Tech Mono', monospace; font-size: 10px; letter-spacing: 0.06em; color: var(--text3); }
+.cmp-val { font-family: 'Share Tech Mono', monospace; font-weight: 400; font-size: 12px; letter-spacing: 0.04em; }
+.vs-wrap {
+  background: var(--glass); backdrop-filter: blur(12px);
+  border: 1px solid var(--b2); border-radius: 8px;
+  padding: 1.25rem; margin-bottom: 0.625rem; overflow-x: auto;
+  background-image: var(--scanline); background-color: var(--glass);
+}
+.vs-title { font-family: 'Share Tech Mono', monospace; font-size: 1rem; letter-spacing: 0.1em; color: var(--text); margin-bottom: 1rem; }
+.vs-row { display: grid; grid-template-columns: 120px repeat(4,1fr); gap: 0.5rem; padding: 0.45rem 0; border-bottom: 1px solid var(--b1); align-items: center; font-size: 12px; }
+.vs-row.hdr { font-family: 'Share Tech Mono', monospace; font-size: 9px; letter-spacing: 0.15em; text-transform: uppercase; color: var(--text3); }
+.vs-row:last-child { border-bottom: none; }
+
+/* ── READ ONLY BANNER ────────────────────────────────────────────────────── */
+.readonly-banner {
+  background: rgba(0,180,255,0.06); border: 1px solid rgba(0,180,255,0.2);
+  border-radius: 5px; padding: 0.6rem 1rem; margin-bottom: 1.25rem;
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 10px; letter-spacing: 0.08em; color: var(--text3);
+  display: flex; align-items: center; gap: 0.5rem;
+}
+
+/* ── EMPTY ───────────────────────────────────────────────────────────────── */
+.empty { text-align: center; padding: 3rem 1rem; }
+.empty-icon { font-size: 3rem; display: block; margin-bottom: 0.875rem; opacity: 0.4; }
+.empty-title { font-family: 'Share Tech Mono', monospace; font-size: 1.2rem; letter-spacing: 0.12em; color: var(--text3); margin-bottom: 0.4rem; text-transform: uppercase; }
+.empty-sub { font-family: 'Share Tech Mono', monospace; font-size: 10px; letter-spacing: 0.1em; color: var(--text3); opacity: 0.6; }
+
+/* ── LOADING / TOAST ─────────────────────────────────────────────────────── */
+.loading-screen { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 60vh; gap: 1.25rem; }
+.loading-logo {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 2.5rem; letter-spacing: 0.25em;
+  color: var(--cyan); text-shadow: 0 0 30px var(--cyan), 0 0 60px rgba(0,212,255,0.3);
+}
+.loading-bar { width: 200px; height: 2px; background: var(--b1); border-radius: 1px; overflow: hidden; }
+.loading-fill { height: 100%; background: var(--pg); box-shadow: 0 0 8px var(--pc); animation: loadfill 1.5s ease infinite; border-radius: 1px; }
+@keyframes loadfill { 0%{width:0;margin-left:0} 50%{width:60%;margin-left:20%} 100%{width:0;margin-left:100%} }
+.toast {
+  position: fixed; bottom: 2rem; left: 50%; transform: translateX(-50%);
+  background: var(--glass2); backdrop-filter: blur(20px);
+  border: 1px solid var(--b3); color: var(--text);
+  padding: 0.6rem 1.5rem; border-radius: 5px;
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 11px; letter-spacing: 0.08em; font-weight: 400;
+  z-index: 200; box-shadow: 0 0 20px var(--pc), 0 8px 32px rgba(0,0,0,0.5);
+  animation: toastIn 0.2s ease; white-space: nowrap;
+}
+@keyframes toastIn { from{opacity:0;transform:translate(-50%,8px)} to{opacity:1;transform:translate(-50%,0)} }
+
+/* ── SECTION LABEL ───────────────────────────────────────────────────────── */
+.sec-label {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 9px; letter-spacing: 0.28em; text-transform: uppercase;
+  color: var(--text3); display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1rem;
+}
+.sec-label::after { content: ''; flex: 1; height: 1px; background: linear-gradient(90deg, var(--b2), transparent); }
+.tabs-actions { display: flex; align-items: center; justify-content: space-between; gap: 1rem; flex-wrap: wrap; margin-bottom: 1.5rem; }
+
+@keyframes spin { to { transform: rotate(360deg); } }
+@keyframes fadeIn { from{opacity:0;transform:translateY(6px)} to{opacity:1;transform:translateY(0)} }
+.fade-in { animation: fadeIn 0.22s ease; }
+@keyframes popIn { from{transform:scale(0.95);opacity:0} to{transform:scale(1);opacity:1} }
+.pop-in { animation: popIn 0.2s cubic-bezier(0.34,1.56,0.64,1); }
+::-webkit-scrollbar { width: 4px; height: 4px; }
+::-webkit-scrollbar-track { background: var(--deep); }
+::-webkit-scrollbar-thumb { background: var(--b3); border-radius: 2px; }
+
+/* ── BOTTOM NAV (mobile-first) ───────────────────────────────────────────── */
+.bottom-nav {
+  position: fixed;
+  bottom: 0; left: 0; right: 0;
+  z-index: 50;
+  background: rgba(7,11,20,0.92);
+  backdrop-filter: blur(20px) saturate(1.8);
+  border-top: 1px solid var(--b2);
+  display: flex;
+  padding: 0 0 env(safe-area-inset-bottom, 0);
+  box-shadow: 0 -4px 24px rgba(0,0,0,0.6);
+}
+.bnav-btn {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+  padding: 0.6rem 0.25rem;
+  background: none;
+  border: none;
+  cursor: pointer;
+  transition: all 0.15s;
+  min-width: 0;
+  position: relative;
+}
+.bnav-btn::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 20%; right: 20%;
+  height: 2px;
+  background: currentColor;
+  border-radius: 0 0 2px 2px;
+  opacity: 0;
+  transition: opacity 0.15s;
+}
+.bnav-btn.active::before { opacity: 1; }
+.bnav-emoji { font-size: 1.3rem; line-height: 1; }
+.bnav-label {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 8px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text3);
+  transition: color 0.15s;
+  white-space: nowrap;
+}
+.bnav-btn.active .bnav-label { color: var(--pc); text-shadow: 0 0 8px var(--pc); }
+
+/* ── FLOATING ADD BUTTON ─────────────────────────────────────────────────── */
+.fab {
+  position: fixed;
+  bottom: calc(70px + env(safe-area-inset-bottom, 0px));
+  right: 1.25rem;
+  z-index: 49;
+  width: 52px; height: 52px;
+  border-radius: 50%;
+  background: var(--pg);
+  border: none;
+  cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1.5rem;
+  box-shadow: 0 0 24px var(--pc), 0 4px 16px rgba(0,0,0,0.5);
+  transition: all 0.2s;
+}
+.fab:hover { transform: scale(1.1); box-shadow: 0 0 32px var(--pc); }
+.fab:active { transform: scale(0.95); }
+
+/* ── RESPONSIVE LAYOUT ───────────────────────────────────────────────────── */
+
+/* Mobile — default (up to 639px) */
+#root { padding: 0 0.875rem 90px; }
+
+.site-header {
+  padding: 1rem 0 0.875rem;
+  margin-bottom: 1.25rem;
+}
+.logo { font-size: 2.2rem; }
+.logo-eyebrow { display: none; }
+.header-badge-name { font-size: 0.85rem; }
+.header-badge-sub { font-size: 9px; }
+
+/* Player rail hidden on mobile — replaced by bottom nav */
+.player-rail { display: none; }
+
+.stat-row {
+  grid-template-columns: repeat(3, 1fr);
+  gap: 5px;
+  margin-bottom: 1.25rem;
+}
+.stat-num { font-size: 1.6rem; }
+
+.nav-tabs { padding: 3px; gap: 2px; margin-bottom: 1.25rem; border-radius: 6px; }
+.nav-tab { padding: 0.35rem 0.65rem; font-size: 10px; }
+
+.tabs-actions { flex-direction: column; align-items: stretch; gap: 0.625rem; }
+.tabs-actions .nav-tabs { flex: 1; }
+.tabs-actions .btn-primary { display: none; } /* hidden — use FAB instead */
+
+.game-card { min-height: 84px; }
+.game-cover { width: 60px; min-width: 60px; }
+.game-title { font-size: 13px; }
+.game-meta { font-size: 9px; }
+.pill { font-size: 8px; padding: 0.12rem 0.4rem; }
+
+.form-grid { grid-template-columns: 1fr; gap: 0.75rem; }
+.col2 { grid-column: 1; }
+.modal-box { border-radius: 16px 16px 0 0; max-height: 92vh; width: 100%; }
+.modal-bg { align-items: flex-end; padding: 0; justify-content: flex-end; flex-direction: column; }
+
+.cmp-grid { grid-template-columns: 1fr 1fr; gap: 0.5rem; }
+.player-goty-grid { grid-template-columns: 1fr 1fr; gap: 0.5rem; }
+
+.vs-row { grid-template-columns: 80px repeat(4,1fr); gap: 0.3rem; font-size: 10px; }
+.vs-row.hdr { font-size: 8px; }
+
+.year-num { font-size: 2.5rem; }
+.goty-title { font-size: 2rem; letter-spacing: 0.1em; }
+.goty-winner { padding: 1rem; gap: 0.875rem; }
+.goty-winner-cover { width: 64px; height: 85px; }
+.goty-winner-title { font-size: 1.2rem; }
+
+.sec-label { font-size: 8px; }
+.top-item { padding: 0.75rem; gap: 0.625rem; }
+.top-rank { font-size: 1.4rem; width: 2rem; }
+
+/* Tablet and up (640px+) */
+@media (min-width: 640px) {
+  #root { padding: 0 1.25rem 6rem; }
+
+  .site-header { padding: 2rem 0 1.5rem; margin-bottom: 1.75rem; }
+  .logo { font-size: 3rem; }
+  .logo-eyebrow { display: block; }
+  .header-badge-name { font-size: 1rem; }
+
+  /* Show desktop player rail, hide bottom nav */
+  .player-rail { display: flex; }
+  .bottom-nav { display: none; }
+  .fab { display: none; }
+
+  .stat-row { grid-template-columns: repeat(auto-fit,minmax(100px,1fr)); gap: 6px; margin-bottom: 1.75rem; }
+  .stat-num { font-size: 2rem; }
+
+  .nav-tabs { padding: 3px; border-radius: 6px; margin-bottom: 1.5rem; }
+  .nav-tab { padding: 0.4rem 0.9rem; font-size: 11px; }
+
+  .tabs-actions { flex-direction: row; align-items: center; gap: 1rem; }
+  .tabs-actions .btn-primary { display: inline-flex; }
+
+  .game-cover { width: 68px; min-width: 68px; }
+  .game-title { font-size: 14px; }
+  .pill { font-size: 9px; padding: 0.15rem 0.5rem; }
+
+  .form-grid { grid-template-columns: 1fr 1fr; gap: 0.875rem; }
+  .col2 { grid-column: 1/-1; }
+  .modal-box { border-radius: 10px; }
+  .modal-bg { align-items: center; padding: 1.5rem 1rem; }
+
+  .cmp-grid { grid-template-columns: repeat(auto-fit,minmax(190px,1fr)); gap: 0.625rem; }
+  .player-goty-grid { grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 0.625rem; }
+
+  .vs-row { grid-template-columns: 120px repeat(4,1fr); gap: 0.5rem; font-size: 12px; }
+  .vs-row.hdr { font-size: 9px; }
+
+  .year-num { font-size: 3.5rem; }
+  .goty-title { font-size: 3rem; letter-spacing: 0.15em; }
+  .goty-winner { padding: 1.5rem; gap: 1.25rem; }
+  .goty-winner-cover { width: 80px; height: 106px; }
+  .goty-winner-title { font-size: 1.5rem; }
+
+  .top-item { padding: 0.875rem 1rem; gap: 0.875rem; }
+  .top-rank { font-size: 1.8rem; width: 2.5rem; }
+}
+</style>
+</head>
+<body>
+<div id="root"></div>
+<script type="text/babel" data-presets="react">
+const { useState, useEffect, useCallback, useRef } = React;
+
+const SUPA_URL = 'https://xinmcvrwyoyiwaeaqiww.supabase.co';
+const SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inhpbm1jdnJ3eW95aXdhZWFxaXd3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM0NjYyOTgsImV4cCI6MjA4OTA0MjI5OH0.c8CVcQKmqjo5I-mcZHFyMl1nBQUtjLBbAjXXPdblmEc';
+const sb = window.supabase.createClient(SUPA_URL, SUPA_KEY);
+
+const PLAYERS = [
+  { id:'greg', label:'Greg', c:'#e8552a', g:'linear-gradient(135deg,#e8552a,#f0a030)', emoji:'🎮' },
+  { id:'anth', label:'Anth', c:'#9b59b6', g:'linear-gradient(135deg,#9b59b6,#6c3483)', emoji:'🕹️' },
+  { id:'sam',  label:'Sam',  c:'#2980b9', g:'linear-gradient(135deg,#2980b9,#1abc9c)', emoji:'⚡' },
+  { id:'joel', label:'Joel', c:'#27ae60', g:'linear-gradient(135deg,#27ae60,#f39c12)', emoji:'🔥' },
+];
+const VIEWS = ['greg','anth','sam','joel','goty','compare'];
+const GENRES=['Action','Adventure','RPG','Strategy','Puzzle','Platformer','Shooter','Sports','Horror','Simulation','Fighting','Racing','Indie','Visual Novel','Other'];
+const PLATFORMS=['PC','PlayStation 5','PlayStation 4','Xbox Series X','Xbox One','Nintendo Switch','Mobile','Other'];
+const STATUSES=[{id:'playing',label:'Playing'},{id:'beaten',label:'Beaten'},{id:'backlog',label:'Backlog'},{id:'dropped',label:'Dropped'}];
+const CUR_YEAR = new Date().getFullYear();
+const uid = () => Date.now().toString(36)+Math.random().toString(36).slice(2);
+const RAWG_KEY = '1934277a3e1e4975a7d5ed786296caea';
+
+async function fetchCovers(q) {
+  try {
+    const r = await fetch(`https://api.rawg.io/api/games?key=${RAWG_KEY}&search=${encodeURIComponent(q)}&page_size=6`);
+    const d = await r.json();
+    return (d.results||[]).filter(g=>g.background_image).map(g=>({id:g.id,name:g.name,cover:g.background_image}));
+  } catch { return []; }
+}
+
+function applyTheme(p) {
+  document.documentElement.style.setProperty('--pc', p.c);
+  document.documentElement.style.setProperty('--pg', p.g);
+}
+
+// ── Stars ─────────────────────────────────────────────────────────────────────
+function Stars({rating, onRate, small}) {
+  const [hover, setHover] = useState(0);
+  const lit = hover||rating;
+  return <span className="stars">{[1,2,3,4,5].map(n=>(
+    <span key={n} className={`star${small?' star-sm':''}${n<=lit?' lit':''}`}
+      onClick={()=>onRate&&onRate(n===rating?0:n)}
+      onMouseEnter={()=>onRate&&setHover(n)} onMouseLeave={()=>onRate&&setHover(0)}>★</span>
+  ))}</span>;
+}
+
+// ── GameCover ─────────────────────────────────────────────────────────────────
+function Cover({url, title, className='game-cover'}) {
+  const [ok, setOk] = useState(false);
+  const [err, setErr] = useState(false);
+  if (!url||err) return <div className="game-cover-ph">{title?.[0]?.toUpperCase()||'?'}</div>;
+  return <>
+    {!ok&&<div style={{display:'flex',alignItems:'center',justifyContent:'center',width:'100%',height:'100%'}}><div className="cover-spin"/></div>}
+    <img src={url} alt={title} onLoad={()=>setOk(true)} onError={()=>setErr(true)} style={{display:ok?'block':'none',width:'100%',height:'100%',objectFit:'cover'}}/>
+  </>;
+}
+
+// ── Modal ─────────────────────────────────────────────────────────────────────
+function Modal({title, children, onClose}) {
+  return <div className="modal-bg" onClick={e=>e.target.classList.contains('modal-bg')&&onClose()}>
+    <div className="modal-box pop-in">
+      <button className="modal-close" onClick={onClose}>✕</button>
+      <div className="modal-title">{title}</div>
+      {children}
+    </div>
+  </div>;
+}
+
+// ── AddGameModal ──────────────────────────────────────────────────────────────
+function AddGameModal({player, onSave, onClose, editGame}) {
+  const [f, setF] = useState(editGame||{title:'',status:'playing',genre:'RPG',platform:'PC',hours:'',rating:0,year:CUR_YEAR,notes:'',cover_url:''});
+  const [covers, setCovers] = useState([]);
+  const [searching, setSearching] = useState(false);
+  const [selCover, setSelCover] = useState(editGame?.cover_url||'');
+  const [saving, setSaving] = useState(false);
+  const U = (k,v)=>setF(p=>({...p,[k]:v}));
+
+  const search = async()=>{
+    if(!f.title.trim()) return;
+    setSearching(true);
+    const r = await fetchCovers(f.title);
+    setCovers(r); setSearching(false);
+  };
+
+  return <Modal title={editGame?'Edit Game':'Add Game'} onClose={onClose}>
+    <div className="form-grid">
+      <div className="form-group col2">
+        <label className="form-lbl">Title</label>
+        <div style={{display:'flex',gap:'0.5rem'}}>
+          <input className="form-inp" style={{flex:1}} value={f.title} onChange={e=>U('title',e.target.value)} placeholder="Game title…" autoFocus onKeyDown={e=>e.key==='Enter'&&search()}/>
+          <button className="btn btn-sm" onClick={search} disabled={searching}>{searching?'…':'🔍 Art'}</button>
+        </div>
+      </div>
+      {covers.length>0&&<div className="form-group col2">
+        <label className="form-lbl">Select Cover Art</label>
+        <div className="cover-results">
+          {covers.map(r=><div key={r.id} className={`cover-opt${selCover===r.cover?' sel':''}`} onClick={()=>setSelCover(r.cover)}><img src={r.cover} alt={r.name} loading="lazy"/></div>)}
+        </div>
+        {selCover&&<div style={{fontSize:10,color:'#5ddb8a',marginTop:4}}>✓ Art selected</div>}
+      </div>}
+      <div className="form-group">
+        <label className="form-lbl">Status</label>
+        <select className="form-sel" value={f.status} onChange={e=>U('status',e.target.value)}>
+          {STATUSES.map(s=><option key={s.id} value={s.id}>{s.label}</option>)}
+        </select>
+      </div>
+      <div className="form-group">
+        <label className="form-lbl">Year</label>
+        <input className="form-inp" type="number" value={f.year} onChange={e=>U('year',parseInt(e.target.value)||CUR_YEAR)} min="1970" max="2040"/>
+      </div>
+      <div className="form-group">
+        <label className="form-lbl">Genre</label>
+        <select className="form-sel" value={f.genre} onChange={e=>U('genre',e.target.value)}>
+          {GENRES.map(g=><option key={g} value={g}>{g}</option>)}
+        </select>
+      </div>
+      <div className="form-group">
+        <label className="form-lbl">Platform</label>
+        <select className="form-sel" value={f.platform} onChange={e=>U('platform',e.target.value)}>
+          {PLATFORMS.map(p=><option key={p} value={p}>{p}</option>)}
+        </select>
+      </div>
+      <div className="form-group">
+        <label className="form-lbl">Hours Played</label>
+        <input className="form-inp" type="number" value={f.hours} onChange={e=>U('hours',e.target.value)} placeholder="0" min="0"/>
+      </div>
+      <div className="form-group">
+        <label className="form-lbl">Your Rating</label>
+        <div style={{paddingTop:'0.5rem'}}><Stars rating={f.rating} onRate={v=>U('rating',v)}/></div>
+      </div>
+      <div className="form-group col2">
+        <label className="form-lbl">Notes</label>
+        <textarea className="form-txta" rows={2} value={f.notes} onChange={e=>U('notes',e.target.value)} placeholder="Thoughts…"/>
+      </div>
+    </div>
+    <div className="modal-actions">
+      <button className="btn" onClick={onClose}>Cancel</button>
+      <button className="btn btn-primary" onClick={async()=>{
+        if(!f.title.trim()) return;
+        setSaving(true);
+        try {
+          await onSave({...f, id:(editGame && editGame.id)||uid(), title:f.title.trim(), cover_url:selCover, player:player.id});
+          onClose();
+        } catch(e) {
+          setSaving(false);
+        }
+        setSaving(false);
+      }} disabled={saving}>{saving?'Saving…':editGame?'Save Changes':'Add to Log'}</button>
+    </div>
+  </Modal>;
+}
+
+// ── GameCard ──────────────────────────────────────────────────────────────────
+function GameCard({game, player, onEdit, onDelete, onRate, readOnly}) {
+  const SC = {playing:'pill-playing',beaten:'pill-beaten',backlog:'pill-backlog',dropped:'pill-dropped'};
+  return <div className="game-card fade-in">
+    <div className="game-accent" style={{background:player.g}}/>
+    <div className="game-cover"><Cover url={game.cover_url} title={game.title}/></div>
+    <div className="game-body">
+      <div>
+        <div className="game-title">{game.title}</div>
+        <div className="game-pills">
+          <span className={`pill ${SC[game.status]||''}`}>{STATUSES.find(s=>s.id===game.status)?.label||game.status}</span>
+          <span className="pill">{game.genre}</span>
+          <span className="pill">{game.platform}</span>
+          {game.year&&<span className="pill">{game.year}</span>}
+          {game.hours?<span className="pill">⏱ {game.hours}h</span>:null}
+        </div>
+        {game.notes&&<div style={{fontSize:11,color:'var(--chrome-light)',fontStyle:'italic',marginBottom:4}}>{game.notes}</div>}
+      </div>
+      <div className="game-bottom">
+        <Stars rating={game.rating} onRate={readOnly?null:onRate} small/>
+        {!readOnly&&<div className="game-actions">
+          <button className="btn btn-sm btn-ghost" onClick={onEdit}>Edit</button>
+          <button className="btn btn-sm btn-danger" onClick={onDelete}>✕</button>
+        </div>}
+      </div>
+    </div>
+  </div>;
+}
+
+// ── PlayerView ────────────────────────────────────────────────────────────────
+function PlayerView({player, games, onAdd, onUpdate, onDelete, isOwn}) {
+  const [tab, setTab] = useState('all');
+  const [showAdd, setShowAdd] = useState(false);
+  const [editGame, setEditGame] = useState(null);
+  const [filterYear, setFilterYear] = useState('all');
+
+  const beaten = games.filter(g=>g.status==='beaten');
+  const playing = games.filter(g=>g.status==='playing');
+  const hours = Math.round(games.reduce((s,g)=>s+(parseFloat(g.hours)||0),0));
+  const rated = games.filter(g=>g.rating>0);
+  const avg = rated.length?(rated.reduce((s,g)=>s+g.rating,0)/rated.length).toFixed(1):'—';
+  const years = [...new Set(games.map(g=>g.year||CUR_YEAR))].sort((a,b)=>b-a);
+
+  const TABS=[{id:'all',label:'All'},{id:'playing',label:'🎮 Playing'},{id:'beaten',label:'✅ Beaten'},{id:'backlog',label:'📋 Backlog'},{id:'by-year',label:'📅 By Year'},{id:'top',label:'⭐ Top Rated'}];
+
+  let shown = games.filter(g=>{
+    if(tab==='playing') return g.status==='playing';
+    if(tab==='beaten')  return g.status==='beaten';
+    if(tab==='backlog') return g.status==='backlog';
+    return true;
+  });
+  if(filterYear!=='all') shown=shown.filter(g=>String(g.year||CUR_YEAR)===filterYear);
+
+  const top = [...games].filter(g=>g.rating>0).sort((a,b)=>b.rating-a.rating||(b.hours||0)-(a.hours||0)).slice(0,10);
+
+  return <div className="fade-in">
+    {!isOwn&&<div className="readonly-banner">👀 Viewing {player.label}'s collection — read only</div>}
+    <div className="stat-row">
+      {[{n:games.length,l:'Games'},{n:beaten.length,l:'Beaten'},{n:playing.length,l:'Playing'},{n:hours,l:'Hours'},{n:avg,l:'Avg ★'}].map(s=>(
+        <div key={s.l} className="stat-card"><div className="stat-num">{s.n}</div><div className="stat-lbl">{s.l}</div></div>
+      ))}
+    </div>
+
+    <div className="tabs-actions">
+      <div className="nav-tabs">
+        {TABS.map(t=><button key={t.id} className={`nav-tab${tab===t.id?' active':''}`} onClick={()=>setTab(t.id)}>{t.label}</button>)}
+      </div>
+      {isOwn&&<button className="btn btn-primary" onClick={()=>setShowAdd(true)}>+ Add Game</button>}
+    </div>
+
+    {tab!=='by-year'&&tab!=='top'&&years.length>1&&<div className="filter-row">
+      {[{id:'all',label:'All Years'},...years.map(y=>({id:String(y),label:String(y)}))].map(y=>(
+        <button key={y.id} className={`fpill${filterYear===y.id?' active':''}`} onClick={()=>setFilterYear(y.id)}>{y.label}</button>
+      ))}
+    </div>}
+
+    {tab==='top'&&<div>
+      {top.length===0&&<div className="empty"><span className="empty-icon">⭐</span><div className="empty-title">No Ratings Yet</div><div className="empty-sub">Rate games to build your top list</div></div>}
+      {top.map((g,i)=>(
+        <div key={g.id} className="top-item">
+          <div className={`top-rank${i===0?' gold':i===1?' silver':i===2?' bronze':''}`}>{String(i+1).padStart(2,'0')}</div>
+          <div className="top-cover"><Cover url={g.cover_url} title={g.title}/></div>
+          <div style={{flex:1,minWidth:0}}>
+            <div className="game-title" style={{marginBottom:3}}>{g.title}</div>
+            <div className="game-meta">{g.genre} · {g.platform}{g.year?` · ${g.year}`:''}{g.hours?` · ${g.hours}h`:''}</div>
+          </div>
+          <div style={{textAlign:'right',flexShrink:0}}>
+            <Stars rating={g.rating} small/>
+            <div className={`pill pill-${g.status}`} style={{marginTop:4,display:'inline-block'}}>{STATUSES.find(s=>s.id===g.status)?.label}</div>
+          </div>
+        </div>
+      ))}
+    </div>}
+
+    {tab==='by-year'&&<div>
+      {years.length===0&&<div className="empty"><span className="empty-icon">📅</span><div className="empty-title">Nothing Archived</div><div className="empty-sub">Add games and they'll appear by year</div></div>}
+      {years.map(yr=>{
+        const yg=games.filter(g=>(g.year||CUR_YEAR)===yr).sort((a,b)=>(b.rating||0)-(a.rating||0));
+        const yb=yg.filter(g=>g.status==='beaten').length;
+        const yh=yg.reduce((s,g)=>s+(parseFloat(g.hours)||0),0);
+        return <div key={yr}>
+          <div className="year-header">
+            <div className="year-num">{yr}</div>
+            <div className="year-meta"><span className="year-meta-main">{yg.length} game{yg.length!==1?'s':''}</span><span className="year-meta-sub">{yb} beaten · {Math.round(yh)}h</span></div>
+            <div className="year-line"/>
+          </div>
+          {yg.map(g=><GameCard key={g.id} game={g} player={player} readOnly={!isOwn} onEdit={()=>setEditGame(g)} onDelete={()=>onDelete(g.id)} onRate={r=>onUpdate({...g,rating:r})}/>)}
+        </div>;
+      })}
+    </div>}
+
+    {tab!=='by-year'&&tab!=='top'&&<div>
+      {shown.length===0&&<div className="empty">
+        <span className="empty-icon">{tab==='playing'?'🎮':tab==='beaten'?'🏆':tab==='backlog'?'📋':'🕹️'}</span>
+        <div className="empty-title">{tab==='playing'?'Nothing Playing':'Empty Here'}</div>
+        <div className="empty-sub">{isOwn?'Add your first game to get started':'This list is empty'}</div>
+      </div>}
+      {[...shown].sort((a,b)=>(b.year||0)-(a.year||0)||(b.rating||0)-(a.rating||0)).map(g=>(
+        <GameCard key={g.id} game={g} player={player} readOnly={!isOwn} onEdit={()=>setEditGame(g)} onDelete={()=>onDelete(g.id)} onRate={r=>onUpdate({...g,rating:r})}/>
+      ))}
+    </div>}
+
+    {showAdd&&<AddGameModal player={player} onClose={()=>setShowAdd(false)} onSave={onAdd}/>}
+    {editGame&&<AddGameModal player={player} editGame={editGame} onClose={()=>setEditGame(null)} onSave={g=>{onUpdate(g);setEditGame(null);}}/>}
+  </div>;
+}
+
+// ── GOTY View ─────────────────────────────────────────────────────────────────
+function GotyView({allGames}) {
+  const [gotyTab, setGotyTab] = useState('combined');
+  const [selYear, setSelYear] = useState(CUR_YEAR);
+
+  const allYears = [...new Set(allGames.map(g=>g.year||CUR_YEAR))].sort((a,b)=>b-a);
+  if (allYears.length===0) allYears.push(CUR_YEAR);
+
+  // Combined GOTY: for each game title, average rating across all players who rated it
+  const combinedGoty = (year) => {
+    const yearGames = allGames.filter(g=>(g.year||CUR_YEAR)===year&&g.rating>0);
+    const byTitle = {};
+    yearGames.forEach(g=>{
+      const k = g.title.toLowerCase().trim();
+      if(!byTitle[k]) byTitle[k]={title:g.title,cover:g.cover_url,ratings:[],genre:g.genre,platform:g.platform};
+      byTitle[k].ratings.push(g.rating);
+      if(!byTitle[k].cover&&g.cover_url) byTitle[k].cover=g.cover_url;
+    });
+    return Object.values(byTitle)
+      .map(g=>({...g, avg:g.ratings.reduce((s,r)=>s+r,0)/g.ratings.length, votes:g.ratings.length}))
+      .sort((a,b)=>b.avg-a.avg||(b.votes-a.votes));
+  };
+
+  // Individual GOTY per player per year
+  const playerGoty = (pid, year) => {
+    return [...allGames.filter(g=>g.player===pid&&(g.year||CUR_YEAR)===year&&g.rating>0)]
+      .sort((a,b)=>b.rating-a.rating||(b.hours||0)-(a.hours||0));
+  };
+
+  const yearGames = combinedGoty(selYear);
+  const winner = yearGames[0];
+  const runners = yearGames.slice(1, 5);
+
+  return <div className="fade-in">
+    <div className="goty-hero">
+      <div className="goty-title">Game of the Year</div>
+      <div className="goty-sub">Rated & ranked by the crew</div>
+    </div>
+
+    {/* Year selector */}
+    <div className="filter-row" style={{justifyContent:'center',marginBottom:'2rem'}}>
+      {allYears.map(y=>(
+        <button key={y} className={`fpill${selYear===y?' active':''}`} onClick={()=>setSelYear(y)}>{y}</button>
+      ))}
+    </div>
+
+    {/* Tab: Combined vs Individual */}
+    <div className="nav-tabs" style={{marginBottom:'2rem'}}>
+      <button className={`nav-tab${gotyTab==='combined'?' active':''}`} onClick={()=>setGotyTab('combined')}>🏆 Combined GOTY</button>
+      <button className={`nav-tab${gotyTab==='individual'?' active':''}`} onClick={()=>setGotyTab('individual')}>👤 Individual Picks</button>
+      <button className={`nav-tab${gotyTab==='all'?' active':''}`} onClick={()=>setGotyTab('all')}>📋 All {selYear} Games</button>
+    </div>
+
+    {/* ── Combined GOTY ── */}
+    {gotyTab==='combined'&&<div>
+      {!winner&&<div className="empty"><span className="empty-icon">🏆</span><div className="empty-title">No Ratings in {selYear}</div><div className="empty-sub">Rate some games to crown a winner</div></div>}
+      {winner&&<>
+        <div className="sec-label">Winner</div>
+        <div className="goty-winner">
+          <div className="goty-winner-cover"><Cover url={winner.cover} title={winner.title}/></div>
+          <div className="goty-winner-info">
+            <span className="goty-crown">👑</span>
+            <div className="goty-winner-title">{winner.title}</div>
+            <div className="goty-winner-meta">{winner.genre} · {winner.votes} rating{winner.votes!==1?'s':''}</div>
+            <Stars rating={Math.round(winner.avg)} small/>
+            <span style={{fontSize:11,color:'var(--chrome-light)',marginLeft:6}}>{winner.avg.toFixed(1)} avg</span>
+          </div>
+        </div>
+        {runners.length>0&&<>
+          <div className="sec-label" style={{marginTop:'1.25rem'}}>Runners Up</div>
+          {runners.map((g,i)=>(
+            <div key={g.title} className="goty-runner">
+              <div className={`top-rank${i===0?' silver':i===1?' bronze':''}`} style={{fontSize:'1.3rem',width:'2rem'}}>{String(i+2).padStart(2,'0')}</div>
+              <div className="goty-runner-cover"><Cover url={g.cover} title={g.title}/></div>
+              <div style={{flex:1,minWidth:0}}>
+                <div style={{fontWeight:700,fontSize:13,color:'var(--chrome-bright)'}}>{g.title}</div>
+                <div style={{fontSize:11,color:'var(--chrome-light)'}}>{g.genre} · {g.votes} rating{g.votes!==1?'s':''}</div>
+              </div>
+              <div style={{textAlign:'right',flexShrink:0}}>
+                <Stars rating={Math.round(g.avg)} small/>
+                <div style={{fontSize:10,color:'var(--chrome-light)'}}>{g.avg.toFixed(1)}</div>
+              </div>
+            </div>
+          ))}
+        </>}
+      </>}
+    </div>}
+
+    {/* ── Individual picks ── */}
+    {gotyTab==='individual'&&<div>
+      <div className="player-goty-grid">
+        {PLAYERS.map(p=>{
+          const picks = playerGoty(p.id, selYear);
+          const top = picks[0];
+          const rest = picks.slice(1,4);
+          return <div key={p.id} className="player-goty-card" style={{'--pc2':p.c}}>
+            <div className="pgoty-name" style={{color:p.c}}>{p.emoji} {p.label}</div>
+            {!top&&<div className="pgoty-none">No ratings in {selYear}</div>}
+            {top&&<>
+              <div className="pgoty-game" style={{marginBottom:'0.75rem'}}>
+                <div className="pgoty-cover"><Cover url={top.cover_url} title={top.title}/></div>
+                <div style={{minWidth:0}}>
+                  <div style={{fontSize:9,color:p.c,fontWeight:700,letterSpacing:'0.1em',textTransform:'uppercase',marginBottom:2}}>GOTY</div>
+                  <div className="pgoty-title">{top.title}</div>
+                  <Stars rating={top.rating} small/>
+                </div>
+              </div>
+              {rest.length>0&&rest.map((g,i)=>(
+                <div key={g.id} style={{display:'flex',alignItems:'center',gap:'0.5rem',padding:'0.3rem 0',borderTop:'1px solid rgba(255,255,255,0.05)'}}>
+                  <span style={{fontSize:10,color:'var(--chrome-steel)',width:16,flexShrink:0}}>#{i+2}</span>
+                  <span style={{fontSize:11,color:'var(--chrome-silver)',flex:1,minWidth:0,overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{g.title}</span>
+                  <Stars rating={g.rating} small/>
+                </div>
+              ))}
+            </>}
+          </div>;
+        })}
+      </div>
+    </div>}
+
+    {/* ── All games that year ── */}
+    {gotyTab==='all'&&<div>
+      <div className="sec-label">All Games Played in {selYear}</div>
+      {PLAYERS.map(p=>{
+        const pg = allGames.filter(g=>g.player===p.id&&(g.year||CUR_YEAR)===selYear).sort((a,b)=>(b.rating||0)-(a.rating||0));
+        if(!pg.length) return null;
+        return <div key={p.id} style={{marginBottom:'2rem'}}>
+          <div className="sec-label" style={{color:p.c}}>{p.emoji} {p.label} — {pg.length} game{pg.length!==1?'s':''}</div>
+          {pg.map(g=><GameCard key={g.id} game={g} player={p} readOnly={true}/>)}
+        </div>;
+      })}
+      {!allGames.filter(g=>(g.year||CUR_YEAR)===selYear).length&&<div className="empty"><span className="empty-icon">🎮</span><div className="empty-title">No Games in {selYear}</div><div className="empty-sub">Add games with this year to see them here</div></div>}
+    </div>}
+  </div>;
+}
+
+// ── CompareView ───────────────────────────────────────────────────────────────
+function CompareView({allGames}) {
+  const stats = PLAYERS.map(p=>{
+    const gs=allGames.filter(g=>g.player===p.id);
+    const beaten=gs.filter(g=>g.status==='beaten').length;
+    const playing=gs.filter(g=>g.status==='playing').length;
+    const hours=Math.round(gs.reduce((s,g)=>s+(parseFloat(g.hours)||0),0));
+    const rated=gs.filter(g=>g.rating>0);
+    const avg=rated.length?(rated.reduce((s,g)=>s+g.rating,0)/rated.length).toFixed(1):'—';
+    const top=[...gs].filter(g=>g.rating>0).sort((a,b)=>b.rating-a.rating)[0];
+    const genres={};gs.forEach(g=>{genres[g.genre]=(genres[g.genre]||0)+1;});
+    const fave=Object.entries(genres).sort((a,b)=>b[1]-a[1])[0]?.[0]||'—';
+    return {...p,total:gs.length,beaten,playing,hours,avg,top,fave};
+  });
+
+  const allYears=[...new Set(allGames.map(g=>g.year||CUR_YEAR))].sort((a,b)=>b-a);
+  const metrics=[
+    {l:'Total Games',f:s=>s.total},
+    {l:'Beaten',     f:s=>s.beaten},
+    {l:'Playing',    f:s=>s.playing},
+    {l:'Hours',      f:s=>s.hours, fmt:v=>v+'h'},
+    {l:'Avg Rating', f:s=>parseFloat(s.avg)||0, fmt:v=>v||'—'},
+  ];
+
+  return <div className="fade-in">
+    <div style={{textAlign:'center',padding:'1.5rem 0 2rem'}}>
+      <div style={{fontFamily:"'Bebas Neue',sans-serif",fontSize:'2.5rem',letterSpacing:'0.12em',background:'var(--chrome-grad)',WebkitBackgroundClip:'text',WebkitTextFillColor:'transparent',backgroundClip:'text',marginBottom:4}}>Head to Head</div>
+      <div style={{fontSize:11,color:'var(--chrome-steel)',letterSpacing:'0.1em',textTransform:'uppercase',fontWeight:600}}>Stats across all players</div>
+    </div>
+    <div className="cmp-grid">
+      {stats.map(p=>(
+        <div key={p.id} className="cmp-card" style={{'--pc2':p.c}}>
+          <div className="cmp-name" style={{color:p.c}}>{p.emoji} {p.label}</div>
+          {[['Games',p.total],['Beaten',p.beaten],['Playing',p.playing],['Hours',p.hours+'h'],['Avg',p.avg],['Fave Genre',p.fave]].map(([k,v])=>(
+            <div key={k} className="cmp-row"><span className="cmp-key">{k}</span><span className="cmp-val" style={{color:p.c}}>{v}</span></div>
+          ))}
+          {p.top&&<div style={{marginTop:'0.75rem',paddingTop:'0.75rem',borderTop:'1px solid rgba(255,255,255,0.06)'}}>
+            <div style={{fontSize:9,fontWeight:700,letterSpacing:'0.15em',textTransform:'uppercase',color:'var(--chrome-steel)',marginBottom:6}}>Top Rated</div>
+            {p.top.cover_url&&<img src={p.top.cover_url} style={{width:'100%',height:70,objectFit:'cover',borderRadius:6,marginBottom:6}} alt={p.top.title}/>}
+            <div style={{fontWeight:700,fontSize:12,color:'var(--chrome-bright)',marginBottom:3}}>{p.top.title}</div>
+            <Stars rating={p.top.rating} small/>
+          </div>}
+        </div>
+      ))}
+    </div>
+    <div className="vs-wrap">
+      <div className="vs-title">Rankings</div>
+      <div className="vs-row hdr"><span>Metric</span>{PLAYERS.map(p=><span key={p.id} style={{color:p.c}}>{p.label}</span>)}</div>
+      {metrics.map(({l,f,fmt})=>{
+        const vals=stats.map(f); const max=Math.max(...vals);
+        return <div key={l} className="vs-row">
+          <span style={{color:'var(--chrome-light)',fontSize:11}}>{l}</span>
+          {stats.map((s,i)=>{const v=vals[i];const isM=v===max&&max>0;return(
+            <span key={s.id} style={{fontWeight:isM?700:400,color:isM?s.c:'var(--chrome-steel)',fontSize:isM?'13px':'12px'}}>
+              {fmt?fmt(v):v}{isM?' ✦':''}
+            </span>
+          );})}
+        </div>;
+      })}
+    </div>
+    {allYears.length>0&&<div className="vs-wrap">
+      <div className="vs-title">By Year</div>
+      <div className="vs-row hdr"><span>Year</span>{PLAYERS.map(p=><span key={p.id} style={{color:p.c}}>{p.label}</span>)}</div>
+      {allYears.map(yr=>(
+        <div key={yr} className="vs-row">
+          <span style={{fontFamily:"'Bebas Neue',sans-serif",fontSize:'1rem',color:'var(--chrome-silver)',letterSpacing:'0.05em'}}>{yr}</span>
+          {PLAYERS.map(p=>{
+            const cnt=allGames.filter(g=>g.player===p.id&&(g.year||CUR_YEAR)===yr).length;
+            const bt=allGames.filter(g=>g.player===p.id&&(g.year||CUR_YEAR)===yr&&g.status==='beaten').length;
+            return <span key={p.id} style={{fontSize:12,fontWeight:cnt>0?600:400,color:cnt>0?p.c:'var(--chrome-steel)'}}>{cnt>0?`${cnt} (${bt}✓)`:'—'}</span>;
+          })}
+        </div>
+      ))}
+    </div>}
+  </div>;
+}
+
+// ── FAB (mobile add button) ───────────────────────────────────────────────
+function FabAdd({ player, onAdd }) {
+  const [open, setOpen] = useState(false);
+  return <>
+    <button className="fab" style={{'--pc':player.c,'--pg':player.g}} onClick={()=>setOpen(true)}>＋</button>
+    {open&&<AddGameModal player={player} onClose={()=>setOpen(false)} onSave={onAdd}/>}
+  </>;
+}
+
+// ── App ───────────────────────────────────────────────────────────────────────
+function App() {
+  const [active, setActive] = useState('greg');
+  const [allGames, setAllGames] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [toast, setToast] = useState('');
+
+  const showToast = msg=>{ setToast(msg); setTimeout(()=>setToast(''),2500); };
+
+  const load = async()=>{
+    const {data,error}=await sb.from('games').select('*').order('created_at',{ascending:false});
+    if(!error) setAllGames(data||[]);
+    setLoading(false);
+  };
+
+  useEffect(()=>{ load(); },[]);
+
+  useEffect(()=>{
+    const sub=sb.channel('games').on('postgres_changes',{event:'*',schema:'public',table:'games'},()=>load()).subscribe();
+    return ()=>sb.removeChannel(sub);
+  },[]);
+
+  useEffect(()=>{
+    const p=active==='goty'||active==='compare'
+      ? {c:'#c8a060',g:'linear-gradient(135deg,#c8a060,#8a6030)'}
+      : PLAYERS.find(p=>p.id===active);
+    if(p) applyTheme(p);
+  },[active]);
+
+  const cp = PLAYERS.find(p=>p.id===active);
+  const pg = id=>allGames.filter(g=>g.player===id);
+
+  const onAdd = async g=>{
+    const {error}=await sb.from('games').insert([g]);
+    if(error) { showToast('Error saving — check connection'); console.error(error); throw error; }
+    showToast('Game added! 🎮');
+  };
+  const onUpdate = async g=>{
+    const {error}=await sb.from('games').update(g).eq('id',g.id);
+    if(error) { showToast('Error saving'); console.error(error); throw error; }
+    showToast('Saved ✓');
+  };
+  const onDelete = async id=>{
+    await sb.from('games').delete().eq('id',id);
+    showToast('Removed');
+  };
+
+  if(loading) return <div className="loading-screen">
+    <div className="loading-logo">PLAYLOG</div>
+    <div className="loading-bar"><div className="loading-fill"/></div>
+    <div style={{fontSize:11,color:'var(--chrome-steel)',letterSpacing:'0.1em'}}>LOADING COLLECTION…</div>
+  </div>;
+
+  const RAIL = [
+    ...PLAYERS,
+    {id:'goty',   label:'GOTY',    c:'#d4892a', emoji:'🏆'},
+    {id:'compare',label:'Compare', c:'#8892a4', emoji:'📊'},
+  ];
+
+  return <div>
+    {/* Header */}
+    <div className="site-header">
+      <div className="header-inner">
+        <div className="logo-block">
+          <div className="logo-eyebrow">Videogame Tracker</div>
+          <div className="logo">PLAYLOG</div>
+        </div>
+        <div className="header-badge">
+          <div className="header-badge-name">{active==='goty'?'GOTY':active==='compare'?'ALL':cp?.label||''}</div>
+          <div className="header-badge-sub">{active==='goty'?'Awards':active==='compare'?'Players':pg(active).length+' games'}</div>
+        </div>
+      </div>
+    </div>
+
+    {/* Desktop player rail */}
+    <div className="player-rail">
+      {RAIL.map(p=>(
+        <button key={p.id} className={`prail-btn${active===p.id?' active':''}`} onClick={()=>setActive(p.id)}>
+          <span className="prail-dot" style={{background:p.c}}/>
+          {p.emoji} {p.label}
+        </button>
+      ))}
+    </div>
+
+    {active==='goty'    && <GotyView    allGames={allGames}/>}
+    {active==='compare' && <CompareView allGames={allGames}/>}
+    {cp&&<PlayerView
+      key={active}
+      player={cp}
+      games={pg(active)}
+      isOwn={true}
+      onAdd={onAdd}
+      onUpdate={onUpdate}
+      onDelete={onDelete}
+    />}
+
+    {/* Mobile FAB — only shown for player pages */}
+    {cp&&<FabAdd player={cp} onAdd={onAdd}/>}
+
+    {/* Mobile bottom nav */}
+    <nav className="bottom-nav">
+      {RAIL.map(p=>(
+        <button key={p.id} className={`bnav-btn${active===p.id?' active':''}`}
+          onClick={()=>setActive(p.id)}
+          style={active===p.id ? {color:p.c} : {}}>
+          <span className="bnav-emoji">{p.emoji}</span>
+          <span className="bnav-label" style={active===p.id ? {color:p.c, textShadow:`0 0 8px ${p.c}`} : {}}>{p.label}</span>
+        </button>
+      ))}
+    </nav>
+
+    {toast&&<div className="toast">{toast}</div>}
+  </div>;
+}
+
+ReactDOM.createRoot(document.getElementById('root')).render(<App/>);
+</script>
+</body>
+</html>
