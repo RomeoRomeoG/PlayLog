@@ -3,655 +3,449 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>PLAYLOG</title>
+<title>Playlog</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Dela+Gothic+One&family=Share+Tech+Mono&family=M+PLUS+Rounded+1c:wght@400;700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
 <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
 <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
-/* ── Y2K JAPANESE CYBER ──────────────────────────────────────────────────── */
 :root {
-  --void:    #0a0010;
-  --space:   #0d0018;
-  --deep:    #100020;
-  --panel:   #140028;
-  --lift:    #1a0035;
-  --raised:  #220045;
+  --bg:       #0f0f0f;
+  --surface:  #1a1a1a;
+  --surface2: #222222;
+  --border:   #2a2a2a;
+  --border2:  #333333;
+  --text:     #f0f0f0;
+  --text2:    #888888;
+  --text3:    #555555;
+  --white:    #ffffff;
+  --accent:   #ffffff;
 
-  --glass:   rgba(255, 20, 180, 0.06);
-  --glass2:  rgba(100, 20, 200, 0.12);
-  --frost:   rgba(255, 100, 220, 0.07);
-  --frost2:  rgba(255, 100, 220, 0.14);
+  --greg-c: #f97316;
+  --anth-c: #a855f7;
+  --sam-c:  #3b82f6;
+  --joel-c: #22c55e;
 
-  --text:    #ffccee;
-  --text2:   #cc88bb;
-  --text3:   #884466;
-  --white:   #fff0f8;
+  --pc: var(--greg-c);
+  --pg: var(--greg-c);
 
-  --b1:      rgba(255,60,200,0.1);
-  --b2:      rgba(255,60,200,0.2);
-  --b3:      rgba(255,60,200,0.4);
-  --bhi:     rgba(255,60,200,0.7);
-
-  /* Core palette */
-  --pink:    #ff2d9b;
-  --pink2:   #ff79c6;
-  --pink3:   #ffb3e0;
-  --blue:    #00d4ff;
-  --blue2:   #0099ee;
-  --purple:  #cc44ff;
-  --silver:  #c8d8f0;
-  --chrome:  linear-gradient(180deg, #ffffff 0%, #c0d0f0 30%, #8090c0 60%, #404870 100%);
-  --orange:  #ff8c00;
-  --yellow:  #ffe000;
-  --green:   #00ff9d;
-
-  /* Player colours */
-  --greg-c: #ff2d9b; --greg-g: linear-gradient(135deg,#ff2d9b,#ff79c6);
-  --anth-c: #cc44ff; --anth-g: linear-gradient(135deg,#cc44ff,#7722cc);
-  --sam-c:  #00d4ff; --sam-g:  linear-gradient(135deg,#00d4ff,#0055ff);
-  --joel-c: #ff8c00; --joel-g: linear-gradient(135deg,#ff8c00,#ffcc00);
-
-  --pc: var(--pink);
-  --pg: var(--greg-g);
-
-  --scanline: repeating-linear-gradient(
-    0deg, transparent, transparent 2px,
-    rgba(0,0,0,0.2) 2px, rgba(0,0,0,0.2) 4px
-  );
-
-  /* Chrome text gradient */
-  --chrome-grad: linear-gradient(180deg,#fff 0%,#ffccee 25%,#ff2d9b 55%,#990066 100%);
-  --chrome-bright: #fff0f8;
-  --chrome-light: #ffccee;
-  --chrome-steel: #cc88bb;
-  --chrome-silver: #ffaadd;
+  --radius: 10px;
+  --radius-sm: 6px;
 }
 
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
 body {
-  background: var(--void);
+  background: var(--bg);
   color: var(--text);
-  font-family: 'M PLUS Rounded 1c', sans-serif;
-  font-size: 16px;
+  font-family: 'Inter', sans-serif;
+  font-size: 14px;
+  line-height: 1.5;
   min-height: 100vh;
-  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
 }
 
-/* Ambient glow */
-body::before {
-  content: '';
-  position: fixed; inset: 0;
-  background:
-    radial-gradient(ellipse 60% 40% at 20% 20%, rgba(255,0,150,0.12) 0%, transparent 60%),
-    radial-gradient(ellipse 50% 40% at 80% 70%, rgba(0,180,255,0.1) 0%, transparent 55%),
-    radial-gradient(ellipse 70% 60% at 50% 50%, rgba(100,0,200,0.08) 0%, transparent 70%);
-  pointer-events: none; z-index: 0;
-}
+#root { max-width: 720px; margin: 0 auto; padding: 0 20px 100px; }
 
-/* Subtle pixel grid */
-body::after {
-  content: '';
-  position: fixed; inset: 0;
-  background-image:
-    repeating-linear-gradient(0deg, transparent, transparent 3px, rgba(255,0,150,0.03) 3px, rgba(255,0,150,0.03) 4px),
-    repeating-linear-gradient(90deg, transparent, transparent 3px, rgba(0,180,255,0.02) 3px, rgba(0,180,255,0.02) 4px);
-  pointer-events: none; z-index: 0;
-}
-
-#root { position: relative; z-index: 1; max-width: 960px; margin: 0 auto; padding: 0 1.25rem 6rem; }
-
-/* ── HEADER ──────────────────────────────────────────────────────────────── */
+/* ── HEADER ── */
 .site-header {
-  padding: 2rem 0 1.5rem;
-  display: flex; align-items: flex-end; justify-content: space-between; gap: 1rem;
-  border-bottom: 1px solid var(--b2);
-  position: relative; margin-bottom: 1.75rem;
-}
-.site-header::after {
-  content: '';
-  position: absolute; bottom: -1px; left: 0;
-  width: 200px; height: 2px;
-  background: linear-gradient(90deg, var(--pink), var(--blue), transparent);
-  box-shadow: 0 0 16px var(--pink), 0 0 32px rgba(0,212,255,0.3);
-}
-.logo-eyebrow {
-  font-family: 'Share Tech Mono', monospace;
-  font-size: 9px; letter-spacing: 0.4em;
-  text-transform: uppercase; color: var(--text3); margin-bottom: 6px;
+  padding: 40px 0 28px;
+  display: flex; align-items: center; justify-content: space-between;
+  border-bottom: 1px solid var(--border); margin-bottom: 28px;
 }
 .logo {
-  font-family: 'Dela Gothic One', sans-serif;
-  font-size: 3rem; font-weight: 400;
-  letter-spacing: 0.06em; line-height: 1;
-  color: var(--white);
-  text-shadow: 0 0 30px var(--pink), 0 0 60px rgba(255,45,155,0.3), 3px 3px 0 rgba(0,212,255,0.4);
-  position: relative;
+  font-size: 18px; font-weight: 700; letter-spacing: -0.02em; color: var(--white);
 }
-.logo::after {
-  content: 'PLAYLOG';
-  position: absolute; inset: 0;
-  background: var(--chrome-grad);
-  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-  background-clip: text; opacity: 0.95;
-}
+.logo span { color: var(--pc); }
+.logo-eyebrow { display: none; }
 .header-badge { text-align: right; }
-.header-badge-name {
-  font-family: 'Dela Gothic One', sans-serif;
-  font-size: 0.9rem; letter-spacing: 0.1em;
-  color: var(--pc); text-shadow: 0 0 12px var(--pc); display: block;
-}
-.header-badge-sub {
-  font-size: 10px; font-family: 'Share Tech Mono', monospace;
-  letter-spacing: 0.15em; color: var(--text3);
-}
+.header-badge-name { font-size: 13px; font-weight: 600; color: var(--pc); display: block; }
+.header-badge-sub { font-size: 11px; color: var(--text3); margin-top: 1px; }
+.header-inner { display: contents; }
+.logo-block { display: contents; }
 
-/* ── PLAYER RAIL ─────────────────────────────────────────────────────────── */
+/* ── PLAYER RAIL ── */
 .player-rail {
-  display: flex; gap: 3px;
-  background: var(--glass);
-  border: 1px solid var(--b2); border-radius: 16px;
-  padding: 5px; margin-bottom: 2rem;
+  display: flex; gap: 4px; margin-bottom: 24px;
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: var(--radius); padding: 4px;
   overflow-x: auto; scrollbar-width: none;
-  box-shadow: 0 0 0 1px var(--b1) inset, 0 4px 24px rgba(255,0,150,0.15),
-    inset 0 1px 0 rgba(255,150,220,0.1);
-  background-image: var(--scanline); background-color: var(--glass);
 }
 .player-rail::-webkit-scrollbar { display: none; }
 .prail-btn {
-  font-family: 'M PLUS Rounded 1c', sans-serif;
-  font-size: 12px; font-weight: 800; letter-spacing: 0.04em;
-  padding: 0.5rem 1.2rem; border-radius: 12px; border: none;
+  font-family: 'Inter', sans-serif; font-size: 12px; font-weight: 500;
+  padding: 6px 14px; border-radius: var(--radius-sm); border: none;
   background: transparent; color: var(--text3); cursor: pointer;
-  transition: all 0.15s; white-space: nowrap;
-  display: flex; align-items: center; gap: 0.4rem; flex-shrink: 0;
+  transition: all 0.12s; white-space: nowrap;
+  display: flex; align-items: center; gap: 6px; flex-shrink: 0;
 }
-.prail-btn:hover { color: var(--text2); background: var(--frost2); }
-.prail-btn.active {
-  background: var(--pg); color: #fff; font-weight: 800;
-  box-shadow: 0 0 20px var(--pc), 0 2px 8px rgba(0,0,0,0.4);
-  text-shadow: 0 0 8px rgba(255,255,255,0.5);
-}
-.prail-dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
-.prail-btn:not(.active) .prail-dot { background: var(--text3); }
-.prail-btn.active .prail-dot { background: rgba(255,255,255,0.9); box-shadow: 0 0 5px #fff; }
+.prail-btn:hover { color: var(--text); background: var(--surface2); }
+.prail-btn.active { background: var(--surface2); color: var(--white); font-weight: 600; border: 1px solid var(--border2); }
+.prail-dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; background: var(--text3); }
+.prail-btn.active .prail-dot { background: var(--pc); }
 
-/* ── STAT CARDS ──────────────────────────────────────────────────────────── */
-.stat-row { display: grid; grid-template-columns: repeat(auto-fit,minmax(100px,1fr)); gap: 6px; margin-bottom: 1.75rem; }
+/* ── STAT CARDS ── */
+.stat-row { display: grid; grid-template-columns: repeat(5,1fr); gap: 8px; margin-bottom: 24px; }
 .stat-card {
-  background: var(--glass);
-  border: 1px solid var(--b2); border-radius: 16px;
-  padding: 1rem 0.875rem; text-align: center;
-  position: relative; overflow: hidden;
-  box-shadow: 0 4px 16px rgba(255,0,150,0.1), inset 0 1px 0 rgba(255,150,220,0.1);
-  background-image: var(--scanline); background-color: var(--glass);
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: var(--radius); padding: 16px 12px; text-align: center;
 }
-.stat-card::before {
-  content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px;
-  background: var(--pg); box-shadow: 0 0 10px var(--pc);
-}
-.stat-card::after {
-  content: ''; position: absolute;
-  top: -20px; right: -20px;
-  width: 60px; height: 60px;
-  background: radial-gradient(circle, rgba(255,45,155,0.15) 0%, transparent 70%);
-  border-radius: 50%;
-}
-.stat-num {
-  font-family: 'Dela Gothic One', sans-serif;
-  font-size: 2rem; letter-spacing: 0.02em;
-  color: var(--pc); text-shadow: 0 0 20px var(--pc);
-  line-height: 1; margin-bottom: 4px;
-}
-.stat-lbl {
-  font-family: 'Share Tech Mono', monospace;
-  font-size: 8px; letter-spacing: 0.22em; text-transform: uppercase; color: var(--text3);
-}
+.stat-num { font-size: 22px; font-weight: 700; color: var(--white); letter-spacing: -0.02em; line-height: 1; margin-bottom: 4px; }
+.stat-lbl { font-size: 10px; font-weight: 500; color: var(--text3); text-transform: uppercase; letter-spacing: 0.06em; }
 
-/* ── NAV TABS ────────────────────────────────────────────────────────────── */
+/* ── NAV TABS ── */
 .nav-tabs {
   display: flex; gap: 2px;
-  background: var(--glass); border: 1px solid var(--b2); border-radius: 12px;
-  padding: 3px; margin-bottom: 1.5rem; overflow-x: auto; scrollbar-width: none;
-  box-shadow: 0 2px 12px rgba(255,0,150,0.1), inset 0 1px 0 rgba(255,150,220,0.06);
-  background-image: var(--scanline); background-color: var(--glass);
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: var(--radius); padding: 3px; margin-bottom: 20px;
+  overflow-x: auto; scrollbar-width: none;
 }
 .nav-tabs::-webkit-scrollbar { display: none; }
 .nav-tab {
-  font-family: 'M PLUS Rounded 1c', sans-serif;
-  font-size: 11px; font-weight: 700; letter-spacing: 0.04em;
-  padding: 0.4rem 0.9rem; border-radius: 9px; border: none;
-  background: transparent; color: var(--text3); cursor: pointer; transition: all 0.15s;
+  font-family: 'Inter', sans-serif; font-size: 12px; font-weight: 500;
+  padding: 6px 12px; border-radius: var(--radius-sm); border: none;
+  background: transparent; color: var(--text3); cursor: pointer; transition: all 0.12s;
   white-space: nowrap;
 }
-.nav-tab:hover { color: var(--text2); background: var(--frost); }
-.nav-tab.active { background: var(--pg); color: #fff; font-weight: 800; box-shadow: 0 0 12px var(--pc); }
+.nav-tab:hover { color: var(--text); background: var(--surface2); }
+.nav-tab.active { background: var(--surface2); color: var(--white); font-weight: 600; border: 1px solid var(--border2); }
 
-/* ── BUTTONS ─────────────────────────────────────────────────────────────── */
+/* ── TABS ACTIONS ── */
+.tabs-actions { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; margin-bottom: 20px; }
+.tabs-actions .nav-tabs { flex: 1; margin-bottom: 0; }
+
+/* ── BUTTONS ── */
 .btn {
-  font-family: 'M PLUS Rounded 1c', sans-serif;
-  font-size: 11px; font-weight: 700; letter-spacing: 0.04em;
-  padding: 0.45rem 1rem; border-radius: 10px; border: 1px solid var(--b2);
-  background: var(--glass); color: var(--text2); cursor: pointer; transition: all 0.15s;
-  display: inline-flex; align-items: center; gap: 0.3rem; white-space: nowrap;
-  box-shadow: 0 2px 8px rgba(255,0,150,0.1), inset 0 1px 0 rgba(255,150,220,0.06);
+  font-family: 'Inter', sans-serif; font-size: 12px; font-weight: 500;
+  padding: 7px 14px; border-radius: var(--radius-sm);
+  border: 1px solid var(--border2); background: var(--surface2);
+  color: var(--text); cursor: pointer; transition: all 0.12s;
+  display: inline-flex; align-items: center; gap: 5px; white-space: nowrap;
 }
-.btn:hover { border-color: var(--b3); color: var(--text); background: var(--frost2); box-shadow: 0 0 12px rgba(255,45,155,0.2); }
+.btn:hover { border-color: var(--text3); color: var(--white); }
 .btn-primary {
-  background: var(--pg); border-color: transparent; color: #fff; font-weight: 800;
-  box-shadow: 0 0 20px var(--pc), 0 4px 16px rgba(0,0,0,0.4);
-  text-shadow: 0 1px 4px rgba(0,0,0,0.3);
+  background: var(--white); border-color: var(--white); color: #000; font-weight: 600;
 }
-.btn-primary:hover { filter: brightness(1.15); transform: translateY(-1px); box-shadow: 0 0 30px var(--pc), 0 6px 20px rgba(0,0,0,0.4); }
-.btn-danger { color: #ff4488; border-color: rgba(255,68,136,0.25); background: rgba(255,68,136,0.06); }
-.btn-danger:hover { background: rgba(255,68,136,0.14); border-color: #ff4488; box-shadow: 0 0 10px rgba(255,68,136,0.3); }
-.btn-sm { padding: 0.25rem 0.6rem; font-size: 10px; }
-.btn-ghost { background: transparent; border-color: transparent; color: var(--text3); box-shadow: none; }
-.btn-ghost:hover { color: var(--text2); background: var(--frost); }
+.btn-primary:hover { background: #e5e5e5; border-color: #e5e5e5; color: #000; }
+.btn-danger { color: #ef4444; border-color: transparent; background: transparent; }
+.btn-danger:hover { background: rgba(239,68,68,0.1); border-color: rgba(239,68,68,0.3); }
+.btn-sm { padding: 4px 10px; font-size: 11px; }
+.btn-ghost { background: transparent; border-color: transparent; color: var(--text3); }
+.btn-ghost:hover { color: var(--text); background: var(--surface2); border-color: transparent; }
 
-/* ── GAME CARD ───────────────────────────────────────────────────────────── */
+/* ── GAME CARD ── */
 .game-card {
-  background: var(--glass);
-  border: 1px solid var(--b2); border-radius: 16px;
-  overflow: hidden; margin-bottom: 6px; display: flex; min-height: 96px;
-  transition: transform 0.18s, box-shadow 0.18s, border-color 0.18s;
-  box-shadow: 0 2px 16px rgba(255,0,150,0.08), inset 0 1px 0 rgba(255,150,220,0.08);
-  background-image: var(--scanline); background-color: var(--glass); position: relative;
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: var(--radius); overflow: hidden;
+  margin-bottom: 6px; display: flex; min-height: 88px;
+  transition: border-color 0.12s;
 }
-.game-card:hover {
-  transform: translateY(-2px); border-color: var(--b3);
-  box-shadow: 0 0 24px var(--pc), 0 8px 32px rgba(0,0,0,0.5);
-}
-.game-accent { width: 4px; min-width: 4px; background: var(--pg); flex-shrink: 0; box-shadow: 0 0 8px var(--pc); border-radius: 16px 0 0 16px; }
-.game-cover { width: 68px; min-width: 68px; background: var(--deep); flex-shrink: 0; overflow: hidden; position: relative; }
+.game-card:hover { border-color: var(--border2); }
+.game-accent { width: 3px; min-width: 3px; background: var(--pc); flex-shrink: 0; }
+.game-cover { width: 60px; min-width: 60px; background: var(--surface2); flex-shrink: 0; overflow: hidden; }
 .game-cover img { width: 100%; height: 100%; object-fit: cover; display: block; }
 .game-cover-ph {
   width: 100%; height: 100%; display: flex; align-items: center; justify-content: center;
-  font-family: 'Dela Gothic One', sans-serif; font-size: 1.6rem; color: var(--text3);
-  background: linear-gradient(135deg, var(--deep), var(--panel));
+  font-size: 20px; color: var(--text3);
 }
-.cover-spin { width: 16px; height: 16px; border: 2px solid var(--b2); border-top-color: var(--pink); border-radius: 50%; animation: spin 0.7s linear infinite; }
-.game-body { padding: 0.875rem 1rem; flex: 1; min-width: 0; display: flex; flex-direction: column; justify-content: space-between; }
-.game-title { font-family: 'M PLUS Rounded 1c', sans-serif; font-weight: 800; font-size: 14px; color: var(--white); line-height: 1.2; margin-bottom: 0.4rem; }
-.game-pills { display: flex; gap: 0.3rem; flex-wrap: wrap; margin-bottom: 0.4rem; align-items: center; }
+.cover-spin { width: 14px; height: 14px; border: 2px solid var(--border2); border-top-color: var(--text2); border-radius: 50%; animation: spin 0.7s linear infinite; }
+.game-body { padding: 12px 14px; flex: 1; min-width: 0; display: flex; flex-direction: column; justify-content: space-between; }
+.game-title { font-size: 13px; font-weight: 600; color: var(--white); line-height: 1.3; margin-bottom: 6px; }
+.game-pills { display: flex; gap: 4px; flex-wrap: wrap; margin-bottom: 6px; }
 .pill {
-  font-family: 'Share Tech Mono', monospace; font-size: 9px;
-  padding: 0.15rem 0.5rem; border-radius: 20px;
-  background: var(--frost); color: var(--text3); border: 1px solid var(--b1); letter-spacing: 0.05em;
+  font-size: 10px; font-weight: 500; padding: 2px 8px; border-radius: 20px;
+  background: var(--surface2); color: var(--text3); border: 1px solid var(--border);
 }
-.pill-playing { background: rgba(255,140,0,0.12); color: var(--orange); border-color: rgba(255,140,0,0.3); text-shadow: 0 0 6px var(--orange); }
-.pill-beaten  { background: rgba(0,255,157,0.1);  color: var(--green);  border-color: rgba(0,255,157,0.3); text-shadow: 0 0 6px var(--green); }
-.pill-backlog { background: var(--frost); color: var(--text3); }
-.pill-dropped { background: rgba(255,68,136,0.1); color: #ff4488; border-color: rgba(255,68,136,0.25); }
-.game-meta { font-family: 'Share Tech Mono', monospace; font-size: 10px; color: var(--text3); display: flex; gap: 0.5rem; flex-wrap: wrap; letter-spacing: 0.03em; }
-.game-bottom { display: flex; align-items: center; justify-content: space-between; gap: 0.5rem; flex-wrap: wrap; margin-top: 0.4rem; }
-.game-actions { display: flex; gap: 0.3rem; }
+.pill-playing { background: rgba(249,115,22,0.1); color: #f97316; border-color: rgba(249,115,22,0.2); }
+.pill-beaten  { background: rgba(34,197,94,0.1);  color: #22c55e; border-color: rgba(34,197,94,0.2); }
+.pill-backlog { background: var(--surface2); color: var(--text3); }
+.pill-dropped { background: rgba(239,68,68,0.1); color: #ef4444; border-color: rgba(239,68,68,0.2); }
+.game-meta { font-size: 10px; color: var(--text3); display: flex; gap: 8px; flex-wrap: wrap; }
+.game-bottom { display: flex; align-items: center; justify-content: space-between; gap: 8px; flex-wrap: wrap; margin-top: 4px; }
+.game-actions { display: flex; gap: 4px; }
 
-/* ── STARS ───────────────────────────────────────────────────────────────── */
+/* ── STARS ── */
 .stars { display: inline-flex; gap: 2px; }
-.star { font-size: 13px; cursor: pointer; transition: transform 0.1s; color: var(--raised); }
-.star:hover { transform: scale(1.35); color: var(--yellow); }
-.star.lit { color: var(--yellow); text-shadow: 0 0 8px var(--yellow); }
+.star { font-size: 12px; cursor: pointer; transition: transform 0.1s; color: var(--border2); }
+.star:hover { transform: scale(1.3); color: #f59e0b; }
+.star.lit { color: #f59e0b; }
 .star-sm { font-size: 11px; }
 
-/* ── MODAL ───────────────────────────────────────────────────────────────── */
+/* ── MODAL ── */
 .modal-bg {
-  position: fixed; inset: 0; background: rgba(10,0,20,0.88);
+  position: fixed; inset: 0; background: rgba(0,0,0,0.7);
   display: flex; align-items: center; justify-content: center;
-  padding: 1.5rem 1rem; z-index: 100; backdrop-filter: blur(10px);
+  padding: 20px; z-index: 100; backdrop-filter: blur(4px);
 }
 .modal-box {
-  background: var(--glass2); border: 1px solid var(--b3); border-radius: 20px;
-  padding: 1.75rem 1.5rem; width: 100%; max-width: 500px; max-height: 90vh; overflow-y: auto;
-  box-shadow: 0 0 50px rgba(255,45,155,0.3), 0 0 100px rgba(0,212,255,0.15), 0 30px 80px rgba(0,0,0,0.7),
-    inset 0 1px 0 rgba(255,150,220,0.15);
-  position: relative; background-image: var(--scanline); background-color: var(--glass2);
+  background: var(--surface); border: 1px solid var(--border2);
+  border-radius: 14px; padding: 24px; width: 100%; max-width: 480px;
+  max-height: 90vh; overflow-y: auto;
+  box-shadow: 0 24px 48px rgba(0,0,0,0.5);
 }
-.modal-box::before {
-  content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px;
-  background: linear-gradient(90deg, var(--pink), var(--blue), var(--purple), var(--pink));
-  background-size: 200% 100%; animation: shimmer 3s linear infinite;
-  box-shadow: 0 0 16px var(--pink); border-radius: 20px 20px 0 0;
-}
-.modal-title {
-  font-family: 'Dela Gothic One', sans-serif;
-  font-size: 1.4rem; letter-spacing: 0.06em; color: var(--white); margin-bottom: 1.5rem;
-  text-shadow: 0 0 20px var(--pink), 2px 2px 0 rgba(0,212,255,0.3);
-}
+.modal-box::before { display: none; }
+.modal-title { font-size: 16px; font-weight: 700; color: var(--white); margin-bottom: 20px; letter-spacing: -0.01em; }
 .modal-close {
-  position: absolute; top: 1.1rem; right: 1.1rem;
-  background: var(--frost); border: 1px solid var(--b2); border-radius: 50%;
-  width: 28px; height: 28px; display: flex; align-items: center; justify-content: center;
-  color: var(--text2); cursor: pointer; transition: all 0.15s; font-size: 0.9rem;
+  position: absolute; top: 16px; right: 16px;
+  background: var(--surface2); border: 1px solid var(--border);
+  border-radius: var(--radius-sm); width: 28px; height: 28px;
+  display: flex; align-items: center; justify-content: center;
+  color: var(--text3); cursor: pointer; transition: all 0.12s; font-size: 12px;
 }
-.modal-close:hover { background: var(--frost2); color: var(--white); border-color: var(--pink); box-shadow: 0 0 8px var(--pink); }
+.modal-close:hover { color: var(--white); border-color: var(--border2); }
 
-/* ── FORM ────────────────────────────────────────────────────────────────── */
-.form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.875rem; }
+/* ── FORM ── */
+.form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
 .col2 { grid-column: 1/-1; }
-.form-group { display: flex; flex-direction: column; gap: 0.35rem; }
-.form-lbl { font-family: 'Share Tech Mono', monospace; font-size: 9px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--text3); }
+.form-group { display: flex; flex-direction: column; gap: 6px; }
+.form-lbl { font-size: 11px; font-weight: 600; color: var(--text3); text-transform: uppercase; letter-spacing: 0.06em; }
 .form-inp, .form-sel, .form-txta {
-  background: rgba(20,0,40,0.7); border: 1px solid var(--b2); border-radius: 10px;
-  padding: 0.55rem 0.75rem; font-family: 'M PLUS Rounded 1c', sans-serif;
-  font-size: 13px; color: var(--text); outline: none; width: 100%;
-  transition: border-color 0.15s, box-shadow 0.15s; -webkit-appearance: none;
+  background: var(--surface2); border: 1px solid var(--border2);
+  border-radius: var(--radius-sm); padding: 8px 12px;
+  font-family: 'Inter', sans-serif; font-size: 13px; color: var(--text);
+  outline: none; width: 100%; transition: border-color 0.12s; -webkit-appearance: none;
 }
-.form-inp:focus, .form-sel:focus {
-  border-color: var(--pink); box-shadow: 0 0 0 2px rgba(255,45,155,0.15), 0 0 14px rgba(255,45,155,0.2);
-}
+.form-inp:focus, .form-sel:focus { border-color: var(--text2); }
 .form-inp::placeholder { color: var(--text3); }
 .form-sel { cursor: pointer; color-scheme: dark; }
-.form-sel option { background: var(--deep); color: var(--text); }
-.form-txta { resize: none; line-height: 1.6; }
-.modal-actions { display: flex; gap: 0.5rem; justify-content: flex-end; margin-top: 1.5rem; }
+.form-sel option { background: var(--surface2); }
+.form-txta { resize: none; line-height: 1.5; }
+.modal-actions { display: flex; gap: 8px; justify-content: flex-end; margin-top: 20px; }
 
-/* ── COVER PICKER ────────────────────────────────────────────────────────── */
-.cover-results { display: grid; grid-template-columns: repeat(auto-fill,minmax(76px,1fr)); gap: 0.4rem; margin-top: 0.5rem; max-height: 190px; overflow-y: auto; }
-.cover-opt { border-radius: 10px; overflow: hidden; cursor: pointer; border: 2px solid transparent; transition: all 0.15s; aspect-ratio: 3/4; }
-.cover-opt:hover { border-color: var(--pink); transform: scale(1.04); box-shadow: 0 0 12px var(--pink); }
-.cover-opt.sel { border-color: var(--pink); box-shadow: 0 0 14px var(--pink); }
+/* ── COVER PICKER ── */
+.cover-results { display: grid; grid-template-columns: repeat(auto-fill,minmax(70px,1fr)); gap: 6px; margin-top: 6px; max-height: 180px; overflow-y: auto; }
+.cover-opt { border-radius: var(--radius-sm); overflow: hidden; cursor: pointer; border: 2px solid transparent; transition: all 0.12s; aspect-ratio: 3/4; }
+.cover-opt:hover { border-color: var(--text2); }
+.cover-opt.sel { border-color: var(--white); }
 .cover-opt img { width: 100%; height: 100%; object-fit: cover; display: block; }
 
-/* ── YEAR HEADER ─────────────────────────────────────────────────────────── */
-.year-header { display: flex; align-items: center; gap: 1rem; padding: 0.5rem 0 1rem; }
-.year-num { font-family: 'Dela Gothic One', sans-serif; font-size: 3.5rem; letter-spacing: 0.06em; color: var(--pc); text-shadow: 0 0 30px var(--pc), 3px 3px 0 rgba(0,212,255,0.3); line-height: 1; }
-.year-meta { display: flex; flex-direction: column; gap: 3px; }
-.year-meta-main { font-family: 'M PLUS Rounded 1c', sans-serif; font-weight: 700; font-size: 13px; color: var(--text); }
-.year-meta-sub { font-family: 'Share Tech Mono', monospace; font-size: 10px; color: var(--text3); letter-spacing: 0.05em; }
-.year-line { flex: 1; height: 1px; background: linear-gradient(90deg, var(--b3), transparent); }
+/* ── YEAR HEADER ── */
+.year-header { display: flex; align-items: center; gap: 14px; padding: 4px 0 16px; }
+.year-num { font-size: 42px; font-weight: 700; letter-spacing: -0.04em; color: var(--white); line-height: 1; }
+.year-meta { display: flex; flex-direction: column; gap: 2px; }
+.year-meta-main { font-size: 13px; font-weight: 600; color: var(--text); }
+.year-meta-sub { font-size: 11px; color: var(--text3); }
+.year-line { flex: 1; height: 1px; background: var(--border); }
 
-/* ── FILTER PILLS ────────────────────────────────────────────────────────── */
-.filter-row { display: flex; gap: 0.35rem; flex-wrap: wrap; margin-bottom: 1.25rem; }
+/* ── FILTER PILLS ── */
+.filter-row { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 16px; }
 .fpill {
-  font-family: 'Share Tech Mono', monospace; font-size: 10px; letter-spacing: 0.06em;
-  padding: 0.3rem 0.75rem; border-radius: 20px; border: 1px solid var(--b2);
-  background: var(--frost); color: var(--text3); cursor: pointer; transition: all 0.15s;
+  font-size: 11px; font-weight: 500; padding: 4px 12px; border-radius: 20px;
+  border: 1px solid var(--border); background: var(--surface2); color: var(--text3);
+  cursor: pointer; transition: all 0.12s;
 }
-.fpill:hover { color: var(--text2); border-color: var(--b3); }
-.fpill.active { background: var(--pg); border-color: transparent; color: #fff; font-weight: 700; box-shadow: 0 0 12px var(--pc); }
+.fpill:hover { color: var(--text); border-color: var(--border2); }
+.fpill.active { background: var(--white); border-color: var(--white); color: #000; font-weight: 600; }
 
-/* ── TOP RATED ───────────────────────────────────────────────────────────── */
+/* ── TOP RATED ── */
 .top-item {
-  background: var(--glass); border: 1px solid var(--b2); border-radius: 14px;
-  padding: 0.875rem 1rem; margin-bottom: 5px;
-  display: flex; align-items: center; gap: 0.875rem;
-  box-shadow: 0 2px 12px rgba(255,0,150,0.06); transition: all 0.15s;
-  background-image: var(--scanline); background-color: var(--glass);
+  background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius);
+  padding: 12px 14px; margin-bottom: 4px; display: flex; align-items: center; gap: 12px;
+  transition: border-color 0.12s;
 }
-.top-item:hover { transform: translateX(4px); border-color: var(--b3); box-shadow: 0 0 16px var(--pc); }
-.top-rank { font-family: 'Dela Gothic One', sans-serif; font-size: 1.8rem; width: 2.5rem; flex-shrink: 0; color: var(--text3); line-height: 1; }
-.top-rank.gold   { color: var(--yellow); text-shadow: 0 0 14px var(--yellow); }
-.top-rank.silver { color: var(--silver); text-shadow: 0 0 8px var(--silver); }
-.top-rank.bronze { color: var(--orange); text-shadow: 0 0 8px var(--orange); }
-.top-cover { width: 38px; height: 50px; border-radius: 8px; overflow: hidden; flex-shrink: 0; background: var(--deep); }
+.top-item:hover { border-color: var(--border2); }
+.top-rank { font-size: 20px; font-weight: 700; width: 32px; flex-shrink: 0; color: var(--text3); line-height: 1; letter-spacing: -0.02em; }
+.top-rank.gold   { color: #f59e0b; }
+.top-rank.silver { color: #9ca3af; }
+.top-rank.bronze { color: #b45309; }
+.top-cover { width: 36px; height: 48px; border-radius: var(--radius-sm); overflow: hidden; flex-shrink: 0; background: var(--surface2); }
 .top-cover img { width: 100%; height: 100%; object-fit: cover; }
 
-/* ── GOTY ────────────────────────────────────────────────────────────────── */
-.goty-hero { text-align: center; padding: 2rem 0 2.5rem; }
-.goty-title {
-  font-family: 'Dela Gothic One', sans-serif; font-size: 3rem; letter-spacing: 0.15em;
-  color: var(--pink); text-shadow: 0 0 30px var(--pink), 0 0 60px rgba(255,45,155,0.3), 4px 4px 0 rgba(0,212,255,0.4);
-  line-height: 1; margin-bottom: 0.5rem;
-}
-.goty-sub { font-family: 'Share Tech Mono', monospace; font-size: 10px; letter-spacing: 0.25em; text-transform: uppercase; color: var(--text3); }
+/* ── GOTY ── */
+.goty-hero { text-align: center; padding: 32px 0 28px; }
+.goty-title { font-size: 28px; font-weight: 700; letter-spacing: -0.03em; color: var(--white); margin-bottom: 6px; }
+.goty-sub { font-size: 11px; color: var(--text3); text-transform: uppercase; letter-spacing: 0.1em; font-weight: 500; }
 .goty-winner {
-  background: var(--glass2); border: 1px solid var(--b3); border-radius: 18px;
-  padding: 1.5rem; display: flex; align-items: center; gap: 1.25rem;
-  box-shadow: 0 0 30px rgba(255,45,155,0.15), 0 4px 32px rgba(0,0,0,0.5); margin-bottom: 0.625rem;
-  position: relative; overflow: hidden; background-image: var(--scanline); background-color: var(--glass2);
+  background: var(--surface); border: 1px solid var(--border2); border-radius: var(--radius);
+  padding: 20px; display: flex; align-items: center; gap: 16px; margin-bottom: 6px;
 }
-.goty-winner::before {
-  content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px;
-  background: linear-gradient(90deg, var(--pink), var(--blue), var(--purple), var(--pink));
-  background-size: 200% 100%; animation: shimmer 3s linear infinite; box-shadow: 0 0 12px var(--pink);
-}
-@keyframes shimmer { 0%{background-position:0% 0%} 100%{background-position:200% 0%} }
-.goty-winner-cover { width: 80px; height: 106px; border-radius: 12px; overflow: hidden; flex-shrink: 0; background: var(--deep); box-shadow: 0 0 20px var(--pink), 0 4px 12px rgba(0,0,0,0.5); }
+.goty-winner::before { display: none; }
+.goty-winner-cover { width: 72px; height: 96px; border-radius: 8px; overflow: hidden; flex-shrink: 0; background: var(--surface2); }
 .goty-winner-cover img { width: 100%; height: 100%; object-fit: cover; }
 .goty-winner-info { flex: 1; min-width: 0; }
-.goty-crown { font-size: 1.5rem; margin-bottom: 4px; display: block; }
-.goty-winner-title { font-family: 'Dela Gothic One', sans-serif; font-size: 1.5rem; letter-spacing: 0.02em; color: var(--white); line-height: 1.1; margin-bottom: 6px; }
-.goty-winner-meta { font-family: 'Share Tech Mono', monospace; font-size: 10px; letter-spacing: 0.06em; color: var(--text3); margin-bottom: 8px; }
+.goty-crown { font-size: 18px; margin-bottom: 4px; display: block; }
+.goty-winner-title { font-size: 18px; font-weight: 700; letter-spacing: -0.02em; color: var(--white); line-height: 1.2; margin-bottom: 6px; }
+.goty-winner-meta { font-size: 11px; color: var(--text3); margin-bottom: 8px; }
 .goty-runner {
-  background: var(--glass); border: 1px solid var(--b2); border-radius: 12px;
-  padding: 0.75rem 1rem; display: flex; align-items: center; gap: 0.75rem; margin-bottom: 4px;
-  background-image: var(--scanline); background-color: var(--glass);
+  background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius);
+  padding: 12px 14px; display: flex; align-items: center; gap: 10px; margin-bottom: 4px;
 }
-.goty-runner-cover { width: 36px; height: 48px; border-radius: 6px; overflow: hidden; flex-shrink: 0; background: var(--deep); }
+.goty-runner-cover { width: 32px; height: 42px; border-radius: 4px; overflow: hidden; flex-shrink: 0; background: var(--surface2); }
 .goty-runner-cover img { width: 100%; height: 100%; object-fit: cover; }
 
-/* ── INDIVIDUAL GOTY ─────────────────────────────────────────────────────── */
-.player-goty-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 0.625rem; margin-bottom: 1.5rem; }
+/* ── PLAYER GOTY ── */
+.player-goty-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 8px; margin-bottom: 24px; }
 .player-goty-card {
-  background: var(--glass); border: 1px solid var(--b2); border-radius: 16px; padding: 1rem;
-  position: relative; overflow: hidden; background-image: var(--scanline); background-color: var(--glass);
+  background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 14px;
+  position: relative;
 }
-.player-goty-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px; background: var(--pc2); box-shadow: 0 0 8px var(--pc2); }
-.pgoty-name { font-family: 'Dela Gothic One', sans-serif; font-size: 1rem; letter-spacing: 0.1em; margin-bottom: 0.75rem; }
-.pgoty-game { display: flex; align-items: center; gap: 0.625rem; }
-.pgoty-cover { width: 36px; height: 48px; border-radius: 6px; overflow: hidden; flex-shrink: 0; background: var(--deep); }
+.player-goty-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px; background: var(--pc2); border-radius: var(--radius) var(--radius) 0 0; }
+.pgoty-name { font-size: 12px; font-weight: 700; margin-bottom: 10px; }
+.pgoty-game { display: flex; align-items: center; gap: 8px; }
+.pgoty-cover { width: 32px; height: 42px; border-radius: 4px; overflow: hidden; flex-shrink: 0; background: var(--surface2); }
 .pgoty-cover img { width: 100%; height: 100%; object-fit: cover; }
-.pgoty-title { font-family: 'M PLUS Rounded 1c', sans-serif; font-weight: 700; font-size: 12px; color: var(--white); line-height: 1.2; }
-.pgoty-none { font-family: 'Share Tech Mono', monospace; font-size: 10px; color: var(--text3); }
+.pgoty-title { font-size: 11px; font-weight: 600; color: var(--white); line-height: 1.3; }
+.pgoty-none { font-size: 11px; color: var(--text3); }
 
-/* ── COMPARE ─────────────────────────────────────────────────────────────── */
-.cmp-grid { display: grid; grid-template-columns: repeat(auto-fit,minmax(190px,1fr)); gap: 0.625rem; margin-bottom: 2rem; }
+/* ── COMPARE ── */
+.cmp-grid { display: grid; grid-template-columns: repeat(auto-fit,minmax(160px,1fr)); gap: 8px; margin-bottom: 20px; }
 .cmp-card {
-  background: var(--glass); border: 1px solid var(--b2); border-radius: 16px; padding: 1.25rem;
-  box-shadow: 0 2px 16px rgba(255,0,150,0.06); position: relative; overflow: hidden;
-  background-image: var(--scanline); background-color: var(--glass);
+  background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 16px;
+  position: relative;
 }
-.cmp-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px; background: var(--pc2); box-shadow: 0 0 8px var(--pc2); }
-.cmp-name { font-family: 'Dela Gothic One', sans-serif; font-size: 1rem; letter-spacing: 0.1em; margin-bottom: 1rem; }
-.cmp-row { display: flex; justify-content: space-between; padding: 0.4rem 0; border-bottom: 1px solid var(--b1); font-size: 12px; }
+.cmp-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px; background: var(--pc2); border-radius: var(--radius) var(--radius) 0 0; }
+.cmp-name { font-size: 13px; font-weight: 700; margin-bottom: 12px; }
+.cmp-row { display: flex; justify-content: space-between; padding: 5px 0; border-bottom: 1px solid var(--border); font-size: 12px; }
 .cmp-row:last-child { border-bottom: none; }
-.cmp-key { font-family: 'Share Tech Mono', monospace; font-size: 10px; letter-spacing: 0.06em; color: var(--text3); }
-.cmp-val { font-family: 'Share Tech Mono', monospace; font-size: 12px; letter-spacing: 0.04em; }
-.vs-wrap {
-  background: var(--glass); border: 1px solid var(--b2); border-radius: 14px;
-  padding: 1.25rem; margin-bottom: 0.625rem; overflow-x: auto;
-  background-image: var(--scanline); background-color: var(--glass);
-}
-.vs-title { font-family: 'Dela Gothic One', sans-serif; font-size: 1rem; letter-spacing: 0.1em; color: var(--text); margin-bottom: 1rem; }
-.vs-row { display: grid; grid-template-columns: 120px repeat(4,1fr); gap: 0.5rem; padding: 0.45rem 0; border-bottom: 1px solid var(--b1); align-items: center; font-size: 12px; }
-.vs-row.hdr { font-family: 'Share Tech Mono', monospace; font-size: 9px; letter-spacing: 0.15em; text-transform: uppercase; color: var(--text3); }
+.cmp-key { color: var(--text3); font-size: 11px; }
+.cmp-val { font-weight: 600; font-size: 12px; }
+.vs-wrap { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 16px; margin-bottom: 8px; overflow-x: auto; }
+.vs-title { font-size: 13px; font-weight: 700; color: var(--white); margin-bottom: 12px; }
+.vs-row { display: grid; grid-template-columns: 120px repeat(4,1fr); gap: 8px; padding: 6px 0; border-bottom: 1px solid var(--border); align-items: center; font-size: 12px; }
+.vs-row.hdr { font-size: 10px; font-weight: 600; color: var(--text3); text-transform: uppercase; letter-spacing: 0.06em; }
 .vs-row:last-child { border-bottom: none; }
 
-/* ── READ ONLY ───────────────────────────────────────────────────────────── */
+/* ── READ ONLY ── */
 .readonly-banner {
-  background: rgba(0,212,255,0.06); border: 1px solid rgba(0,212,255,0.2);
-  border-radius: 10px; padding: 0.6rem 1rem; margin-bottom: 1.25rem;
-  font-family: 'Share Tech Mono', monospace; font-size: 10px; letter-spacing: 0.08em; color: var(--text3);
-  display: flex; align-items: center; gap: 0.5rem;
+  background: var(--surface2); border: 1px solid var(--border);
+  border-radius: var(--radius-sm); padding: 8px 12px; margin-bottom: 16px;
+  font-size: 11px; color: var(--text3); display: flex; align-items: center; gap: 6px;
 }
 
-/* ── EMPTY ───────────────────────────────────────────────────────────────── */
-.empty { text-align: center; padding: 3rem 1rem; }
-.empty-icon { font-size: 3rem; display: block; margin-bottom: 0.875rem; opacity: 0.4; }
-.empty-title { font-family: 'Dela Gothic One', sans-serif; font-size: 1.2rem; letter-spacing: 0.12em; color: var(--text3); margin-bottom: 0.4rem; text-transform: uppercase; }
-.empty-sub { font-family: 'Share Tech Mono', monospace; font-size: 10px; letter-spacing: 0.1em; color: var(--text3); opacity: 0.6; }
+/* ── EMPTY ── */
+.empty { text-align: center; padding: 48px 20px; }
+.empty-icon { font-size: 32px; display: block; margin-bottom: 12px; opacity: 0.3; }
+.empty-title { font-size: 15px; font-weight: 600; color: var(--text2); margin-bottom: 4px; }
+.empty-sub { font-size: 12px; color: var(--text3); }
 
-/* ── LOADING / TOAST ─────────────────────────────────────────────────────── */
-.loading-screen { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 60vh; gap: 1.25rem; }
-.loading-logo {
-  font-family: 'Dela Gothic One', sans-serif; font-size: 3rem; letter-spacing: 0.25em;
-  background: var(--chrome-grad); -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-  background-clip: text; text-shadow: none; filter: drop-shadow(0 0 20px rgba(255,45,155,0.6));
-}
-.loading-bar { width: 200px; height: 3px; background: var(--b1); border-radius: 2px; overflow: hidden; }
-.loading-fill { height: 100%; background: var(--pg); box-shadow: 0 0 10px var(--pc); animation: loadfill 1.5s ease infinite; border-radius: 2px; }
+/* ── LOADING / TOAST ── */
+.loading-screen { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 60vh; gap: 20px; }
+.loading-logo { font-size: 20px; font-weight: 700; letter-spacing: -0.02em; color: var(--white); }
+.loading-bar { width: 160px; height: 2px; background: var(--border); border-radius: 1px; overflow: hidden; }
+.loading-fill { height: 100%; background: var(--white); animation: loadfill 1.5s ease infinite; border-radius: 1px; }
 @keyframes loadfill { 0%{width:0;margin-left:0} 50%{width:60%;margin-left:20%} 100%{width:0;margin-left:100%} }
 .toast {
-  position: fixed; bottom: 2rem; left: 50%; transform: translateX(-50%);
-  background: var(--glass2); border: 1px solid var(--b3); color: var(--text);
-  padding: 0.6rem 1.5rem; border-radius: 20px;
-  font-family: 'M PLUS Rounded 1c', sans-serif; font-weight: 700;
-  font-size: 13px; z-index: 200;
-  box-shadow: 0 0 24px var(--pc), 0 8px 32px rgba(0,0,0,0.5);
-  animation: toastIn 0.2s ease; white-space: nowrap;
+  position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%);
+  background: var(--white); color: #000; padding: 8px 18px; border-radius: 20px;
+  font-size: 13px; font-weight: 600; z-index: 200;
+  box-shadow: 0 4px 24px rgba(0,0,0,0.4); animation: toastIn 0.2s ease; white-space: nowrap;
 }
-@keyframes toastIn { from{opacity:0;transform:translate(-50%,8px)} to{opacity:1;transform:translate(-50%,0)} }
+@keyframes toastIn { from{opacity:0;transform:translate(-50%,6px)} to{opacity:1;transform:translate(-50%,0)} }
 
-/* ── SECTION LABEL ───────────────────────────────────────────────────────── */
+/* ── SEC LABEL ── */
 .sec-label {
-  font-family: 'Share Tech Mono', monospace; font-size: 9px; letter-spacing: 0.28em;
-  text-transform: uppercase; color: var(--text3);
-  display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1rem;
+  font-size: 10px; font-weight: 600; color: var(--text3); text-transform: uppercase;
+  letter-spacing: 0.08em; display: flex; align-items: center; gap: 10px; margin-bottom: 12px;
 }
-.sec-label::after { content: ''; flex: 1; height: 1px; background: linear-gradient(90deg, var(--b2), transparent); }
-.tabs-actions { display: flex; align-items: center; justify-content: space-between; gap: 1rem; flex-wrap: wrap; margin-bottom: 1.5rem; }
+.sec-label::after { content: ''; flex: 1; height: 1px; background: var(--border); }
 
-/* ── BOTTOM NAV ──────────────────────────────────────────────────────────── */
+/* ── BOTTOM NAV ── */
 .bottom-nav {
   position: fixed; bottom: 0; left: 0; right: 0; z-index: 50;
-  background: rgba(10,0,20,0.94); backdrop-filter: blur(20px) saturate(1.8);
-  border-top: 1px solid var(--b2); display: flex;
+  background: rgba(15,15,15,0.95); backdrop-filter: blur(12px);
+  border-top: 1px solid var(--border); display: flex;
   padding: 0 0 env(safe-area-inset-bottom, 0);
-  box-shadow: 0 -4px 24px rgba(255,0,150,0.15);
 }
 .bnav-btn {
   flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center;
-  gap: 3px; padding: 0.6rem 0.25rem; background: none; border: none; cursor: pointer;
-  transition: all 0.15s; min-width: 0; position: relative;
+  gap: 3px; padding: 10px 4px; background: none; border: none; cursor: pointer;
+  transition: all 0.12s; min-width: 0; position: relative;
 }
-.bnav-btn::before {
-  content: ''; position: absolute; top: 0; left: 20%; right: 20%;
-  height: 2px; background: currentColor; border-radius: 0 0 2px 2px;
-  opacity: 0; transition: opacity 0.15s;
-}
-.bnav-btn.active::before { opacity: 1; }
-.bnav-emoji { font-size: 1.3rem; line-height: 1; }
-.bnav-label { font-family: 'Share Tech Mono', monospace; font-size: 8px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--text3); transition: color 0.15s; white-space: nowrap; }
-.bnav-btn.active .bnav-label { color: var(--pc); text-shadow: 0 0 8px var(--pc); }
+.bnav-emoji { font-size: 18px; line-height: 1; }
+.bnav-label { font-size: 9px; font-weight: 500; color: var(--text3); letter-spacing: 0.04em; text-transform: uppercase; white-space: nowrap; transition: color 0.12s; }
+.bnav-btn.active .bnav-label { color: var(--pc); }
+.bnav-btn::before { display: none; }
 
-/* ── FAB ─────────────────────────────────────────────────────────────────── */
+/* ── FAB ── */
 .fab {
-  position: fixed; bottom: calc(70px + env(safe-area-inset-bottom, 0px)); right: 1.25rem; z-index: 49;
-  width: 52px; height: 52px; border-radius: 50%; background: var(--pg); border: none; cursor: pointer;
-  display: flex; align-items: center; justify-content: center; font-size: 1.5rem;
-  box-shadow: 0 0 28px var(--pc), 0 4px 16px rgba(0,0,0,0.5); transition: all 0.2s;
+  position: fixed; bottom: calc(66px + env(safe-area-inset-bottom, 0px)); right: 20px; z-index: 49;
+  width: 48px; height: 48px; border-radius: 50%;
+  background: var(--white); border: none; cursor: pointer;
+  display: flex; align-items: center; justify-content: center; font-size: 22px; color: #000;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.4); transition: all 0.15s;
 }
-.fab:hover { transform: scale(1.1); box-shadow: 0 0 40px var(--pc); }
+.fab:hover { transform: scale(1.06); }
 .fab:active { transform: scale(0.95); }
 
-/* ── ANIMATIONS ──────────────────────────────────────────────────────────── */
+/* ── ANIMATIONS ── */
 @keyframes spin { to { transform: rotate(360deg); } }
-@keyframes fadeIn { from{opacity:0;transform:translateY(6px)} to{opacity:1;transform:translateY(0)} }
-.fade-in { animation: fadeIn 0.22s ease; }
-@keyframes popIn { from{transform:scale(0.95);opacity:0} to{transform:scale(1);opacity:1} }
-.pop-in { animation: popIn 0.2s cubic-bezier(0.34,1.56,0.64,1); }
+@keyframes fadeIn { from{opacity:0;transform:translateY(4px)} to{opacity:1;transform:translateY(0)} }
+.fade-in { animation: fadeIn 0.18s ease; }
+@keyframes popIn { from{transform:scale(0.97);opacity:0} to{transform:scale(1);opacity:1} }
+.pop-in { animation: popIn 0.18s cubic-bezier(0.34,1.56,0.64,1); }
 ::-webkit-scrollbar { width: 4px; height: 4px; }
-::-webkit-scrollbar-track { background: var(--deep); }
-::-webkit-scrollbar-thumb { background: var(--b3); border-radius: 2px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 2px; }
 
-/* ── MOBILE ──────────────────────────────────────────────────────────────── */
+/* ── MOBILE ── */
 body { font-size: 13px; }
-#root { padding: 0 0.75rem 82px; }
-.site-header { padding: 0.75rem 0 0.625rem; margin-bottom: 1rem; }
-.header-inner { padding: 0; }
-.logo { font-size: 1.8rem; }
+#root { padding: 0 16px 88px; }
+.site-header { padding: 24px 0 18px; margin-bottom: 18px; }
+.logo { font-size: 16px; }
 .logo-eyebrow { display: none; }
-.header-badge-name { font-size: 0.75rem; }
-.header-badge-sub { font-size: 8px; }
 .player-rail { display: none; }
-.stat-row { grid-template-columns: repeat(3, 1fr); gap: 4px; margin-bottom: 1rem; }
-.stat-card { padding: 0.625rem 0.5rem; }
-.stat-num { font-size: 1.3rem; }
-.stat-lbl { font-size: 7px; letter-spacing: 0.12em; }
-.nav-tabs { padding: 2px; gap: 2px; margin-bottom: 1rem; }
-.nav-tab { padding: 0.3rem 0.5rem; font-size: 9px; }
-.tabs-actions { flex-direction: column; align-items: stretch; gap: 0.5rem; }
-.tabs-actions .nav-tabs { flex: 1; }
+.stat-row { grid-template-columns: repeat(3,1fr); gap: 6px; margin-bottom: 16px; }
+.stat-card { padding: 12px 8px; }
+.stat-num { font-size: 18px; }
+.stat-lbl { font-size: 9px; }
+.nav-tabs { padding: 3px; gap: 2px; margin-bottom: 14px; }
+.nav-tab { padding: 5px 8px; font-size: 10px; }
+.tabs-actions { flex-direction: column; gap: 8px; margin-bottom: 14px; }
 .tabs-actions .btn-primary { display: none; }
 .game-card { min-height: 76px; margin-bottom: 4px; }
 .game-cover { width: 52px; min-width: 52px; }
-.game-body { padding: 0.625rem 0.75rem; }
-.game-title { font-size: 12px; margin-bottom: 0.3rem; }
-.game-pills { gap: 0.2rem; margin-bottom: 0.3rem; }
-.game-meta { font-size: 8px; gap: 0.3rem; }
-.pill { font-size: 7px; padding: 0.1rem 0.35rem; }
-.star { font-size: 11px; }
-.star-sm { font-size: 10px; }
-.form-grid { grid-template-columns: 1fr; gap: 0.625rem; }
+.game-body { padding: 10px 12px; }
+.game-title { font-size: 12px; }
+.pill { font-size: 9px; padding: 2px 6px; }
+.form-grid { grid-template-columns: 1fr; gap: 12px; }
 .col2 { grid-column: 1; }
-.form-lbl { font-size: 8px; }
-.form-inp, .form-sel, .form-txta { font-size: 14px; padding: 0.5rem 0.625rem; }
-.modal-box { border-radius: 20px 20px 0 0; max-height: 92vh; width: 100%; padding: 1.25rem 1rem; }
-.modal-bg { align-items: flex-end; padding: 0; justify-content: flex-end; flex-direction: column; }
-.modal-title { font-size: 1.1rem; margin-bottom: 1rem; }
-.btn { font-size: 10px; padding: 0.4rem 0.875rem; }
-.btn-sm { font-size: 9px; padding: 0.22rem 0.5rem; }
-.cmp-grid { grid-template-columns: 1fr 1fr; gap: 0.4rem; }
-.cmp-card { padding: 0.875rem 0.75rem; }
-.cmp-name { font-size: 1.1rem; margin-bottom: 0.625rem; }
-.cmp-row { font-size: 11px; padding: 0.3rem 0; }
-.player-goty-grid { grid-template-columns: 1fr 1fr; gap: 0.4rem; }
-.player-goty-card { padding: 0.75rem; }
-.vs-wrap { padding: 0.875rem 0.75rem; }
-.vs-row { grid-template-columns: 70px repeat(4,1fr); gap: 0.2rem; font-size: 9px; padding: 0.3rem 0; }
-.vs-row.hdr { font-size: 7px; }
-.year-num { font-size: 2rem; }
-.year-meta-main { font-size: 11px; }
-.year-meta-sub { font-size: 9px; }
-.goty-title { font-size: 1.6rem; letter-spacing: 0.08em; }
-.goty-hero { padding: 1rem 0 1.5rem; }
-.goty-sub { font-size: 9px; }
-.goty-winner { padding: 0.875rem; gap: 0.75rem; }
+.modal-box { border-radius: 16px 16px 0 0; max-height: 92vh; }
+.modal-bg { align-items: flex-end; padding: 0; }
+.modal-title { font-size: 15px; margin-bottom: 16px; }
+.cmp-grid { grid-template-columns: 1fr 1fr; }
+.player-goty-grid { grid-template-columns: 1fr 1fr; }
+.vs-row { grid-template-columns: 70px repeat(4,1fr); gap: 4px; font-size: 10px; }
+.goty-title { font-size: 22px; }
+.goty-winner { padding: 14px; gap: 12px; }
 .goty-winner-cover { width: 56px; height: 74px; }
-.goty-winner-title { font-size: 1.05rem; }
-.goty-winner-meta { font-size: 9px; }
-.goty-runner { padding: 0.625rem 0.75rem; }
-.goty-runner-cover { width: 30px; height: 40px; }
-.sec-label { font-size: 7px; letter-spacing: 0.18em; }
-.top-item { padding: 0.625rem 0.75rem; gap: 0.5rem; margin-bottom: 4px; }
-.top-rank { font-size: 1.2rem; width: 1.8rem; }
-.top-cover { width: 32px; height: 42px; }
-.cover-results { grid-template-columns: repeat(auto-fill, minmax(64px, 1fr)); gap: 0.3rem; max-height: 160px; }
-.fab { width: 44px; height: 44px; font-size: 1.2rem; bottom: calc(58px + env(safe-area-inset-bottom, 0px)); right: 1rem; }
+.goty-winner-title { font-size: 15px; }
+.top-item { padding: 10px 12px; gap: 10px; }
+.top-rank { font-size: 16px; width: 26px; }
+.top-cover { width: 30px; height: 40px; }
 .bottom-nav { display: flex; }
-.bnav-btn { padding: 0.5rem 0.2rem; gap: 2px; }
-.bnav-emoji { font-size: 1.1rem; }
-.bnav-label { font-size: 7px; }
+.fab { width: 44px; height: 44px; font-size: 20px; }
 
-/* ── TABLET AND UP ───────────────────────────────────────────────────────── */
+/* ── TABLET+ ── */
 @media (min-width: 640px) {
-  body { font-size: 16px; }
-  #root { padding: 0 1.25rem 6rem; }
-  .site-header { padding: 2rem 0 1.5rem; margin-bottom: 1.75rem; }
-  .logo { font-size: 3rem; }
-  .logo-eyebrow { display: block; }
-  .header-badge-name { font-size: 1rem; }
+  body { font-size: 14px; }
+  #root { padding: 0 20px 100px; }
+  .site-header { padding: 40px 0 28px; margin-bottom: 28px; }
+  .logo { font-size: 18px; }
   .player-rail { display: flex; }
   .bottom-nav { display: none; }
   .fab { display: none; }
-  .stat-row { grid-template-columns: repeat(auto-fit,minmax(100px,1fr)); gap: 6px; margin-bottom: 1.75rem; }
-  .stat-num { font-size: 2rem; }
-  .nav-tabs { padding: 3px; margin-bottom: 1.5rem; }
-  .nav-tab { padding: 0.4rem 0.9rem; font-size: 11px; }
-  .tabs-actions { flex-direction: row; align-items: center; gap: 1rem; }
+  .stat-row { grid-template-columns: repeat(5,1fr); gap: 8px; margin-bottom: 24px; }
+  .stat-num { font-size: 22px; }
+  .nav-tab { padding: 6px 12px; font-size: 12px; }
+  .tabs-actions { flex-direction: row; align-items: center; }
   .tabs-actions .btn-primary { display: inline-flex; }
-  .game-cover { width: 68px; min-width: 68px; }
-  .game-title { font-size: 14px; }
-  .pill { font-size: 9px; padding: 0.15rem 0.5rem; }
-  .form-grid { grid-template-columns: 1fr 1fr; gap: 0.875rem; }
+  .game-cover { width: 60px; min-width: 60px; }
+  .form-grid { grid-template-columns: 1fr 1fr; }
   .col2 { grid-column: 1/-1; }
-  .modal-box { border-radius: 20px; }
-  .modal-bg { align-items: center; padding: 1.5rem 1rem; }
-  .cmp-grid { grid-template-columns: repeat(auto-fit,minmax(190px,1fr)); gap: 0.625rem; }
-  .player-goty-grid { grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 0.625rem; }
-  .vs-row { grid-template-columns: 120px repeat(4,1fr); gap: 0.5rem; font-size: 12px; }
-  .vs-row.hdr { font-size: 9px; }
-  .year-num { font-size: 3.5rem; }
-  .goty-title { font-size: 3rem; letter-spacing: 0.15em; }
-  .goty-winner { padding: 1.5rem; gap: 1.25rem; }
-  .goty-winner-cover { width: 80px; height: 106px; }
-  .goty-winner-title { font-size: 1.5rem; }
-  .top-item { padding: 0.875rem 1rem; gap: 0.875rem; }
-  .top-rank { font-size: 1.8rem; width: 2.5rem; }
+  .modal-box { border-radius: 14px; }
+  .modal-bg { align-items: center; padding: 20px; }
+  .cmp-grid { grid-template-columns: repeat(auto-fit,minmax(160px,1fr)); }
+  .player-goty-grid { grid-template-columns: repeat(auto-fit,minmax(160px,1fr)); }
+  .vs-row { grid-template-columns: 120px repeat(4,1fr); gap: 8px; font-size: 12px; }
+  .goty-title { font-size: 28px; }
+  .goty-winner { padding: 20px; gap: 16px; }
+  .goty-winner-cover { width: 72px; height: 96px; }
+  .goty-winner-title { font-size: 18px; }
+  .top-item { padding: 12px 14px; gap: 12px; }
+  .top-rank { font-size: 20px; width: 32px; }
+  .top-cover { width: 36px; height: 48px; }
 }
 </style>
 </head>
@@ -665,12 +459,11 @@ const SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsI
 const sb = window.supabase.createClient(SUPA_URL, SUPA_KEY);
 
 const PLAYERS = [
-  { id:'greg', label:'Greg', c:'#ff2d9b', g:'linear-gradient(135deg,#ff2d9b,#ff79c6)', emoji:'🎮' },
-  { id:'anth', label:'Anth', c:'#cc44ff', g:'linear-gradient(135deg,#cc44ff,#7722cc)', emoji:'🕹️' },
-  { id:'sam',  label:'Sam',  c:'#00d4ff', g:'linear-gradient(135deg,#00d4ff,#0055ff)', emoji:'⚡' },
-  { id:'joel', label:'Joel', c:'#ff8c00', g:'linear-gradient(135deg,#ff8c00,#ffcc00)', emoji:'🔥' },
+  { id:'greg', label:'Greg', c:'#f97316', g:'#f97316', emoji:'🎮' },
+  { id:'anth', label:'Anth', c:'#a855f7', g:'#a855f7', emoji:'🕹️' },
+  { id:'sam',  label:'Sam',  c:'#3b82f6', g:'#3b82f6', emoji:'⚡' },
+  { id:'joel', label:'Joel', c:'#22c55e', g:'#22c55e', emoji:'🔥' },
 ];
-const VIEWS = ['greg','anth','sam','joel','goty','compare'];
 const GENRES=['Action','Adventure','RPG','Strategy','Puzzle','Platformer','Shooter','Sports','Horror','Simulation','Fighting','Racing','Indie','Visual Novel','Other'];
 const PLATFORMS=['PC','PlayStation 5','PlayStation 4','Xbox Series X','Xbox One','Nintendo Switch','Mobile','Other'];
 const STATUSES=[{id:'playing',label:'Playing'},{id:'beaten',label:'Beaten'},{id:'backlog',label:'Backlog'},{id:'dropped',label:'Dropped'}];
@@ -690,7 +483,6 @@ function applyTheme(p) {
   document.documentElement.style.setProperty('--pg', p.g);
 }
 
-// ── Stars ─────────────────────────────────────────────────────────────────────
 function Stars({rating, onRate, small}) {
   const [hover, setHover] = useState(0);
   const lit = hover||rating;
@@ -701,7 +493,6 @@ function Stars({rating, onRate, small}) {
   ))}</span>;
 }
 
-// ── GameCover ─────────────────────────────────────────────────────────────────
 function Cover({url, title}) {
   const [ok, setOk] = useState(false);
   const [err, setErr] = useState(false);
@@ -712,10 +503,9 @@ function Cover({url, title}) {
   </>;
 }
 
-// ── Modal ─────────────────────────────────────────────────────────────────────
 function Modal({title, children, onClose}) {
   return <div className="modal-bg" onClick={e=>e.target.classList.contains('modal-bg')&&onClose()}>
-    <div className="modal-box pop-in">
+    <div className="modal-box pop-in" style={{position:'relative'}}>
       <button className="modal-close" onClick={onClose}>✕</button>
       <div className="modal-title">{title}</div>
       {children}
@@ -723,7 +513,6 @@ function Modal({title, children, onClose}) {
   </div>;
 }
 
-// ── AddGameModal ──────────────────────────────────────────────────────────────
 function AddGameModal({player, onSave, onClose, editGame}) {
   const [f, setF] = useState(editGame||{title:'',status:'playing',genre:'RPG',platform:'PC',hours:'',rating:0,year:CUR_YEAR,notes:'',cover_url:''});
   const [covers, setCovers] = useState([]);
@@ -742,48 +531,44 @@ function AddGameModal({player, onSave, onClose, editGame}) {
 
   const handleSave = async () => {
     if(!f.title.trim()) return;
-    setSaving(true);
-    setSaveError('');
+    setSaving(true); setSaveError('');
     try {
-      // Build game object — never include id on insert
       const gameData = {
         title: f.title.trim(),
         status: f.status,
         genre: f.genre,
         platform: f.platform,
-        hours: f.hours,
-        rating: f.rating,
-        year: f.year,
-        notes: f.notes,
-        cover_url: selCover,
+        hours: f.hours === '' || f.hours === null || f.hours === undefined ? null : parseFloat(f.hours) || null,
+        rating: !f.rating ? null : parseInt(f.rating) || null,
+        year: f.year ? parseInt(f.year) : null,
+        notes: f.notes || null,
+        cover_url: selCover || null,
         player: player.id,
       };
-      if (editGame && editGame.id) {
-        gameData.id = editGame.id;
-      }
+      if (editGame && editGame.id) gameData.id = editGame.id;
       await onSave(gameData);
       onClose();
     } catch(e) {
-      setSaveError(e?.message || 'Save failed — check console');
+      setSaveError(e?.message || 'Save failed');
       setSaving(false);
     }
   };
 
-  return <Modal title={editGame?'Edit Game':'Add Game'} onClose={onClose}>
+  return <Modal title={editGame?'Edit game':'Add game'} onClose={onClose}>
     <div className="form-grid">
       <div className="form-group col2">
         <label className="form-lbl">Title</label>
-        <div style={{display:'flex',gap:'0.5rem'}}>
+        <div style={{display:'flex',gap:'8px'}}>
           <input className="form-inp" style={{flex:1}} value={f.title} onChange={e=>U('title',e.target.value)} placeholder="Game title…" autoFocus onKeyDown={e=>e.key==='Enter'&&search()}/>
-          <button className="btn btn-sm" onClick={search} disabled={searching}>{searching?'…':'🔍 Art'}</button>
+          <button className="btn btn-sm" onClick={search} disabled={searching}>{searching?'…':'Search art'}</button>
         </div>
       </div>
       {covers.length>0&&<div className="form-group col2">
-        <label className="form-lbl">Select Cover Art</label>
+        <label className="form-lbl">Cover art</label>
         <div className="cover-results">
           {covers.map(r=><div key={r.id} className={`cover-opt${selCover===r.cover?' sel':''}`} onClick={()=>setSelCover(r.cover)}><img src={r.cover} alt={r.name} loading="lazy"/></div>)}
         </div>
-        {selCover&&<div style={{fontSize:10,color:'var(--green)',marginTop:4}}>✓ Art selected</div>}
+        {selCover&&<div style={{fontSize:11,color:'#22c55e',marginTop:4}}>✓ Cover selected</div>}
       </div>}
       <div className="form-group">
         <label className="form-lbl">Status</label>
@@ -808,33 +593,32 @@ function AddGameModal({player, onSave, onClose, editGame}) {
         </select>
       </div>
       <div className="form-group">
-        <label className="form-lbl">Hours Played</label>
+        <label className="form-lbl">Hours played</label>
         <input className="form-inp" type="number" value={f.hours} onChange={e=>U('hours',e.target.value)} placeholder="0" min="0"/>
       </div>
       <div className="form-group">
-        <label className="form-lbl">Your Rating</label>
-        <div style={{paddingTop:'0.5rem'}}><Stars rating={f.rating} onRate={v=>U('rating',v)}/></div>
+        <label className="form-lbl">Rating</label>
+        <div style={{paddingTop:'6px'}}><Stars rating={f.rating} onRate={v=>U('rating',v)}/></div>
       </div>
       <div className="form-group col2">
         <label className="form-lbl">Notes</label>
-        <textarea className="form-txta" rows={2} value={f.notes} onChange={e=>U('notes',e.target.value)} placeholder="Thoughts…"/>
+        <textarea className="form-txta" rows={2} value={f.notes} onChange={e=>U('notes',e.target.value)} placeholder="Any thoughts…"/>
       </div>
     </div>
-    {saveError&&<div style={{color:'#ff4488',fontSize:12,marginTop:8,fontFamily:'Share Tech Mono',letterSpacing:'0.05em'}}>⚠ {saveError}</div>}
+    {saveError&&<div style={{color:'#ef4444',fontSize:12,marginTop:8}}>⚠ {saveError}</div>}
     <div className="modal-actions">
-      <button className="btn" onClick={onClose}>Cancel</button>
+      <button className="btn btn-ghost" onClick={onClose}>Cancel</button>
       <button className="btn btn-primary" onClick={handleSave} disabled={saving}>
-        {saving?'Saving…':editGame?'Save Changes':'Add to Log'}
+        {saving?'Saving…':editGame?'Save changes':'Add game'}
       </button>
     </div>
   </Modal>;
 }
 
-// ── GameCard ──────────────────────────────────────────────────────────────────
 function GameCard({game, player, onEdit, onDelete, onRate, readOnly}) {
   const SC = {playing:'pill-playing',beaten:'pill-beaten',backlog:'pill-backlog',dropped:'pill-dropped'};
   return <div className="game-card fade-in">
-    <div className="game-accent" style={{background:player.g}}/>
+    <div className="game-accent" style={{background:player.c}}/>
     <div className="game-cover"><Cover url={game.cover_url} title={game.title}/></div>
     <div className="game-body">
       <div>
@@ -844,22 +628,21 @@ function GameCard({game, player, onEdit, onDelete, onRate, readOnly}) {
           <span className="pill">{game.genre}</span>
           <span className="pill">{game.platform}</span>
           {game.year&&<span className="pill">{game.year}</span>}
-          {game.hours?<span className="pill">⏱ {game.hours}h</span>:null}
+          {game.hours?<span className="pill">{game.hours}h</span>:null}
         </div>
-        {game.notes&&<div style={{fontSize:11,color:'var(--text2)',fontStyle:'italic',marginBottom:4}}>{game.notes}</div>}
+        {game.notes&&<div style={{fontSize:11,color:'var(--text3)',fontStyle:'italic',marginBottom:4,lineHeight:1.4}}>{game.notes}</div>}
       </div>
       <div className="game-bottom">
-        <Stars rating={game.rating} onRate={readOnly?null:onRate} small/>
+        <Stars rating={game.rating||0} onRate={readOnly?null:onRate} small/>
         {!readOnly&&<div className="game-actions">
           <button className="btn btn-sm btn-ghost" onClick={onEdit}>Edit</button>
-          <button className="btn btn-sm btn-danger" onClick={onDelete}>✕</button>
+          <button className="btn btn-sm btn-danger" onClick={onDelete}>Remove</button>
         </div>}
       </div>
     </div>
   </div>;
 }
 
-// ── PlayerView ────────────────────────────────────────────────────────────────
 function PlayerView({player, games, onAdd, onUpdate, onDelete, isOwn}) {
   const [tab, setTab] = useState('all');
   const [showAdd, setShowAdd] = useState(false);
@@ -873,7 +656,7 @@ function PlayerView({player, games, onAdd, onUpdate, onDelete, isOwn}) {
   const avg = rated.length?(rated.reduce((s,g)=>s+g.rating,0)/rated.length).toFixed(1):'—';
   const years = [...new Set(games.map(g=>g.year||CUR_YEAR))].sort((a,b)=>b-a);
 
-  const TABS=[{id:'all',label:'All'},{id:'playing',label:'🎮 Playing'},{id:'beaten',label:'✅ Beaten'},{id:'backlog',label:'📋 Backlog'},{id:'by-year',label:'📅 By Year'},{id:'top',label:'⭐ Top Rated'}];
+  const TABS=[{id:'all',label:'All'},{id:'playing',label:'Playing'},{id:'beaten',label:'Beaten'},{id:'backlog',label:'Backlog'},{id:'by-year',label:'By year'},{id:'top',label:'Top rated'}];
 
   let shown = games.filter(g=>{
     if(tab==='playing') return g.status==='playing';
@@ -886,25 +669,22 @@ function PlayerView({player, games, onAdd, onUpdate, onDelete, isOwn}) {
   const top = [...games].filter(g=>g.rating>0).sort((a,b)=>b.rating-a.rating||(b.hours||0)-(a.hours||0)).slice(0,10);
 
   return <div className="fade-in">
-    {!isOwn&&<div className="readonly-banner">👀 Viewing {player.label}'s collection — read only</div>}
+    {!isOwn&&<div className="readonly-banner">👀 Viewing {player.label}'s collection</div>}
     <div className="stat-row">
-      {[{n:games.length,l:'Games'},{n:beaten.length,l:'Beaten'},{n:playing.length,l:'Playing'},{n:hours,l:'Hours'},{n:avg,l:'Avg ★'}].map(s=>(
+      {[{n:games.length,l:'Games'},{n:beaten.length,l:'Beaten'},{n:playing.length,l:'Playing'},{n:hours,l:'Hours'},{n:avg,l:'Avg'}].map(s=>(
         <div key={s.l} className="stat-card"><div className="stat-num">{s.n}</div><div className="stat-lbl">{s.l}</div></div>
       ))}
     </div>
-
     <div className="tabs-actions">
       <div className="nav-tabs">
         {TABS.map(t=><button key={t.id} className={`nav-tab${tab===t.id?' active':''}`} onClick={()=>setTab(t.id)}>{t.label}</button>)}
       </div>
-      {isOwn&&<button className="btn btn-primary" onClick={()=>setShowAdd(true)}>＋ Add Game</button>}
+      {isOwn&&<button className="btn btn-primary" onClick={()=>setShowAdd(true)}>+ Add game</button>}
     </div>
-
     {tab==='by-year'&&<div className="filter-row">
-      <button className={`fpill${filterYear==='all'?' active':''}`} onClick={()=>setFilterYear('all')}>All Years</button>
+      <button className={`fpill${filterYear==='all'?' active':''}`} onClick={()=>setFilterYear('all')}>All years</button>
       {years.map(y=><button key={y} className={`fpill${filterYear===String(y)?' active':''}`} onClick={()=>setFilterYear(String(y))}>{y}</button>)}
     </div>}
-
     {tab==='top'
       ? top.length
         ? top.map((g,i)=>{
@@ -913,28 +693,26 @@ function PlayerView({player, games, onAdd, onUpdate, onDelete, isOwn}) {
               <div className={`top-rank${i<3?' '+ranks[i]:''}`}>{i+1}</div>
               <div className="top-cover">{g.cover_url&&<img src={g.cover_url} alt={g.title}/>}</div>
               <div style={{flex:1,minWidth:0}}>
-                <div style={{fontWeight:700,fontSize:13,color:'var(--chrome-bright)',marginBottom:3}}>{g.title}</div>
+                <div style={{fontWeight:600,fontSize:13,color:'var(--white)',marginBottom:3}}>{g.title}</div>
                 <Stars rating={g.rating} small/>
-                <div style={{fontSize:10,color:'var(--text3)',marginTop:3,fontFamily:"'Share Tech Mono',monospace"}}>{g.platform} · {g.year||CUR_YEAR}{g.hours?' · '+g.hours+'h':''}</div>
+                <div style={{fontSize:10,color:'var(--text3)',marginTop:3}}>{g.platform} · {g.year||CUR_YEAR}{g.hours?' · '+g.hours+'h':''}</div>
               </div>
             </div>;
           })
-        : <div className="empty"><span className="empty-icon">⭐</span><div className="empty-title">No Rated Games</div><div className="empty-sub">Rate games to see your top list</div></div>
+        : <div className="empty"><span className="empty-icon">⭐</span><div className="empty-title">No rated games yet</div><div className="empty-sub">Rate games to build your top list</div></div>
       : shown.length
         ? shown.map(g=><GameCard key={g.id} game={g} player={player}
             onEdit={()=>setEditGame(g)}
             onDelete={()=>{ if(confirm('Remove this game?')) onDelete(g.id); }}
             onRate={v=>onUpdate({...g,rating:v})}
           />)
-        : <div className="empty"><span className="empty-icon">🎮</span><div className="empty-title">No Games Here</div><div className="empty-sub">Add some games to get started</div></div>
+        : <div className="empty"><span className="empty-icon">🎮</span><div className="empty-title">Nothing here yet</div><div className="empty-sub">Add some games to get started</div></div>
     }
-
     {showAdd&&<AddGameModal player={player} onClose={()=>setShowAdd(false)} onSave={onAdd}/>}
     {editGame&&<AddGameModal player={player} editGame={editGame} onClose={()=>setEditGame(null)} onSave={onUpdate}/>}
   </div>;
 }
 
-// ── GotyView ──────────────────────────────────────────────────────────────────
 function GotyView({allGames}) {
   const CUR = CUR_YEAR;
   const [selYear, setSelYear] = useState(CUR);
@@ -948,69 +726,60 @@ function GotyView({allGames}) {
   });
 
   const allRated=allGames.filter(g=>(g.year||CUR)===selYear&&g.rating>0);
-  const overall=[...allRated].sort((a,b)=>b.rating-a.rating-(a.rating-b.rating));
+  const overall=[...allRated].sort((a,b)=>b.rating-a.rating);
   const winner=overall[0]||null;
   const runners=overall.slice(1,4);
 
   return <div className="fade-in">
     <div className="goty-hero">
-      <div className="goty-title">GAME OF THE YEAR</div>
-      <div className="goty-sub">{"// community picks //"}</div>
-      <div style={{display:'flex',gap:'0.4rem',justifyContent:'center',marginTop:'1rem',flexWrap:'wrap'}}>
+      <div className="goty-title">Game of the Year</div>
+      <div className="goty-sub">Community picks</div>
+      <div style={{display:'flex',gap:'6px',justifyContent:'center',marginTop:'16px',flexWrap:'wrap'}}>
         {allYears.map(y=><button key={y} className={`fpill${selYear===y?' active':''}`} onClick={()=>setSelYear(y)}>{y}</button>)}
       </div>
     </div>
-
-    {winner
-      ? <>
-          <div className="sec-label">Overall Winner — {selYear}</div>
-          <div className="goty-winner">
-            <div className="goty-winner-cover">{winner.cover_url&&<img src={winner.cover_url} alt={winner.title}/>}</div>
-            <div className="goty-winner-info">
-              <span className="goty-crown">👑</span>
-              <div className="goty-winner-title">{winner.title}</div>
-              <div className="goty-winner-meta">{winner.platform} · {winner.genre}</div>
-              <Stars rating={winner.rating} small/>
-            </div>
-          </div>
-          {runners.length>0&&<><div className="sec-label" style={{marginTop:'1.5rem'}}>Runners Up</div>
-          {runners.map(g=><div key={g.id} className="goty-runner">
-            <div className="goty-runner-cover">{g.cover_url&&<img src={g.cover_url} alt={g.title}/>}</div>
-            <div style={{flex:1,minWidth:0}}><div style={{fontWeight:700,fontSize:13,color:'var(--chrome-bright)'}}>{g.title}</div><Stars rating={g.rating} small/></div>
-          </div>)}</>}
-        </>
-      : <div className="empty"><span className="empty-icon">🏆</span><div className="empty-title">No Rated Games in {selYear}</div><div className="empty-sub">Rate games to crown a winner</div></div>
-    }
-
-    <div className="sec-label" style={{marginTop:'2rem'}}>Each Player's Pick — {selYear}</div>
+    {winner ? <>
+      <div className="sec-label">Winner — {selYear}</div>
+      <div className="goty-winner">
+        <div className="goty-winner-cover">{winner.cover_url&&<img src={winner.cover_url} alt={winner.title}/>}</div>
+        <div className="goty-winner-info">
+          <span className="goty-crown">🏆</span>
+          <div className="goty-winner-title">{winner.title}</div>
+          <div className="goty-winner-meta">{winner.platform} · {winner.genre}</div>
+          <Stars rating={winner.rating} small/>
+        </div>
+      </div>
+      {runners.length>0&&<><div className="sec-label" style={{marginTop:'20px'}}>Runners up</div>
+      {runners.map(g=><div key={g.id} className="goty-runner">
+        <div className="goty-runner-cover">{g.cover_url&&<img src={g.cover_url} alt={g.title}/>}</div>
+        <div style={{flex:1,minWidth:0}}><div style={{fontWeight:600,fontSize:13,color:'var(--white)'}}>{g.title}</div><Stars rating={g.rating} small/></div>
+      </div>)}</>}
+    </> : <div className="empty"><span className="empty-icon">🏆</span><div className="empty-title">No rated games in {selYear}</div><div className="empty-sub">Rate games to crown a winner</div></div>}
+    <div className="sec-label" style={{marginTop:'28px'}}>Each player's pick — {selYear}</div>
     <div className="player-goty-grid">
       {byPlayer.map(p=>(
         <div key={p.id} className="player-goty-card" style={{'--pc2':p.c}}>
           <div className="pgoty-name" style={{color:p.c}}>{p.emoji} {p.label}</div>
-          {p.top
-            ? <div className="pgoty-game">
-                <div className="pgoty-cover">{p.top.cover_url&&<img src={p.top.cover_url} alt={p.top.title}/>}</div>
-                <div><div className="pgoty-title">{p.top.title}</div><Stars rating={p.top.rating} small/></div>
-              </div>
-            : <div className="pgoty-none">No rated games</div>}
+          {p.top ? <div className="pgoty-game">
+            <div className="pgoty-cover">{p.top.cover_url&&<img src={p.top.cover_url} alt={p.top.title}/>}</div>
+            <div><div className="pgoty-title">{p.top.title}</div><Stars rating={p.top.rating} small/></div>
+          </div> : <div className="pgoty-none">No rated games</div>}
         </div>
       ))}
     </div>
-
-    <div className="sec-label">All Games Played in {selYear}</div>
+    <div className="sec-label">All games — {selYear}</div>
     {PLAYERS.map(p=>{
-      const pg = allGames.filter(g=>g.player===p.id&&(g.year||CUR_YEAR)===selYear).sort((a,b)=>(b.rating||0)-(a.rating||0));
+      const pg=allGames.filter(g=>g.player===p.id&&(g.year||CUR_YEAR)===selYear).sort((a,b)=>(b.rating||0)-(a.rating||0));
       if(!pg.length) return null;
-      return <div key={p.id} style={{marginBottom:'2rem'}}>
+      return <div key={p.id} style={{marginBottom:'20px'}}>
         <div className="sec-label" style={{color:p.c}}>{p.emoji} {p.label} — {pg.length} game{pg.length!==1?'s':''}</div>
         {pg.map(g=><GameCard key={g.id} game={g} player={p} readOnly={true}/>)}
       </div>;
     })}
-    {!allGames.filter(g=>(g.year||CUR_YEAR)===selYear).length&&<div className="empty"><span className="empty-icon">🎮</span><div className="empty-title">No Games in {selYear}</div><div className="empty-sub">Add games with this year to see them here</div></div>}
+    {!allGames.filter(g=>(g.year||CUR_YEAR)===selYear).length&&<div className="empty"><span className="empty-icon">🎮</span><div className="empty-title">No games in {selYear}</div></div>}
   </div>;
 }
 
-// ── CompareView ───────────────────────────────────────────────────────────────
 function CompareView({allGames}) {
   const stats = PLAYERS.map(p=>{
     const gs=allGames.filter(g=>g.player===p.id);
@@ -1024,32 +793,30 @@ function CompareView({allGames}) {
     const fave=Object.entries(genres).sort((a,b)=>b[1]-a[1])[0]?.[0]||'—';
     return {...p,total:gs.length,beaten,playing,hours,avg,top,fave};
   });
-
   const allYears=[...new Set(allGames.map(g=>g.year||CUR_YEAR))].sort((a,b)=>b-a);
   const metrics=[
-    {l:'Total Games',f:s=>s.total},
-    {l:'Beaten',     f:s=>s.beaten},
-    {l:'Playing',    f:s=>s.playing},
-    {l:'Hours',      f:s=>s.hours, fmt:v=>v+'h'},
-    {l:'Avg Rating', f:s=>parseFloat(s.avg)||0, fmt:v=>v||'—'},
+    {l:'Total',   f:s=>s.total},
+    {l:'Beaten',  f:s=>s.beaten},
+    {l:'Playing', f:s=>s.playing},
+    {l:'Hours',   f:s=>s.hours, fmt:v=>v+'h'},
+    {l:'Avg',     f:s=>parseFloat(s.avg)||0, fmt:(_,s)=>s.avg},
   ];
-
   return <div className="fade-in">
-    <div style={{textAlign:'center',padding:'1.5rem 0 2rem'}}>
-      <div style={{fontFamily:"'Dela Gothic One',sans-serif",fontSize:'2.5rem',letterSpacing:'0.12em',background:'var(--chrome-grad)',WebkitBackgroundClip:'text',WebkitTextFillColor:'transparent',backgroundClip:'text',marginBottom:4,filter:'drop-shadow(0 0 16px rgba(255,45,155,0.4))'}}>Head to Head</div>
-      <div style={{fontSize:11,color:'var(--chrome-steel)',letterSpacing:'0.1em',textTransform:'uppercase',fontWeight:600,fontFamily:"'Share Tech Mono',monospace"}}>Stats across all players</div>
+    <div style={{padding:'28px 0 24px',textAlign:'center'}}>
+      <div style={{fontSize:22,fontWeight:700,letterSpacing:'-0.02em',color:'var(--white)',marginBottom:4}}>Head to Head</div>
+      <div style={{fontSize:11,color:'var(--text3)',textTransform:'uppercase',letterSpacing:'0.08em',fontWeight:500}}>Stats across all players</div>
     </div>
     <div className="cmp-grid">
       {stats.map(p=>(
         <div key={p.id} className="cmp-card" style={{'--pc2':p.c}}>
           <div className="cmp-name" style={{color:p.c}}>{p.emoji} {p.label}</div>
-          {[['Games',p.total],['Beaten',p.beaten],['Playing',p.playing],['Hours',p.hours+'h'],['Avg',p.avg],['Fave Genre',p.fave]].map(([k,v])=>(
+          {[['Games',p.total],['Beaten',p.beaten],['Playing',p.playing],['Hours',p.hours+'h'],['Avg',p.avg],['Genre',p.fave]].map(([k,v])=>(
             <div key={k} className="cmp-row"><span className="cmp-key">{k}</span><span className="cmp-val" style={{color:p.c}}>{v}</span></div>
           ))}
-          {p.top&&<div style={{marginTop:'0.75rem',paddingTop:'0.75rem',borderTop:'1px solid rgba(255,255,255,0.06)'}}>
-            <div style={{fontSize:9,fontWeight:700,letterSpacing:'0.15em',textTransform:'uppercase',color:'var(--chrome-steel)',marginBottom:6,fontFamily:"'Share Tech Mono',monospace"}}>Top Rated</div>
-            {p.top.cover_url&&<img src={p.top.cover_url} style={{width:'100%',height:70,objectFit:'cover',borderRadius:8,marginBottom:6}} alt={p.top.title}/>}
-            <div style={{fontWeight:700,fontSize:12,color:'var(--chrome-bright)',marginBottom:3}}>{p.top.title}</div>
+          {p.top&&<div style={{marginTop:10,paddingTop:10,borderTop:'1px solid var(--border)'}}>
+            <div style={{fontSize:10,fontWeight:600,color:'var(--text3)',textTransform:'uppercase',letterSpacing:'0.06em',marginBottom:6}}>Top rated</div>
+            {p.top.cover_url&&<img src={p.top.cover_url} style={{width:'100%',height:60,objectFit:'cover',borderRadius:6,marginBottom:6}} alt={p.top.title}/>}
+            <div style={{fontWeight:600,fontSize:12,color:'var(--white)',marginBottom:3}}>{p.top.title}</div>
             <Stars rating={p.top.rating} small/>
           </div>}
         </div>
@@ -1061,10 +828,10 @@ function CompareView({allGames}) {
       {metrics.map(({l,f,fmt})=>{
         const vals=stats.map(f); const max=Math.max(...vals);
         return <div key={l} className="vs-row">
-          <span style={{color:'var(--chrome-light)',fontSize:11,fontFamily:"'Share Tech Mono',monospace"}}>{l}</span>
+          <span style={{color:'var(--text3)',fontSize:11}}>{l}</span>
           {stats.map((s,i)=>{const v=vals[i];const isM=v===max&&max>0;return(
-            <span key={s.id} style={{fontWeight:isM?700:400,color:isM?s.c:'var(--chrome-steel)',fontSize:isM?'13px':'12px',fontFamily:"'Share Tech Mono',monospace"}}>
-              {fmt?fmt(v):v}{isM?' ✦':''}
+            <span key={s.id} style={{fontWeight:isM?700:400,color:isM?s.c:'var(--text3)',fontSize:isM?'13px':'12px'}}>
+              {fmt?fmt(v,s):v}{isM?' ↑':''}
             </span>
           );})}
         </div>;
@@ -1075,11 +842,11 @@ function CompareView({allGames}) {
       <div className="vs-row hdr"><span>Year</span>{PLAYERS.map(p=><span key={p.id} style={{color:p.c}}>{p.label}</span>)}</div>
       {allYears.map(yr=>(
         <div key={yr} className="vs-row">
-          <span style={{fontFamily:"'Dela Gothic One',sans-serif",fontSize:'1rem',color:'var(--chrome-silver)',letterSpacing:'0.05em'}}>{yr}</span>
+          <span style={{fontSize:13,fontWeight:600,color:'var(--text2)'}}>{yr}</span>
           {PLAYERS.map(p=>{
             const cnt=allGames.filter(g=>g.player===p.id&&(g.year||CUR_YEAR)===yr).length;
             const bt=allGames.filter(g=>g.player===p.id&&(g.year||CUR_YEAR)===yr&&g.status==='beaten').length;
-            return <span key={p.id} style={{fontSize:12,fontWeight:cnt>0?600:400,color:cnt>0?p.c:'var(--chrome-steel)',fontFamily:"'Share Tech Mono',monospace"}}>{cnt>0?`${cnt} (${bt}✓)`:'—'}</span>;
+            return <span key={p.id} style={{fontSize:12,fontWeight:cnt>0?600:400,color:cnt>0?p.c:'var(--text3)'}}>{cnt>0?`${cnt} (${bt}✓)`:'—'}</span>;
           })}
         </div>
       ))}
@@ -1087,23 +854,21 @@ function CompareView({allGames}) {
   </div>;
 }
 
-// ── FAB ───────────────────────────────────────────────────────────────────────
 function FabAdd({ player, onAdd }) {
   const [open, setOpen] = useState(false);
   return <>
-    <button className="fab" style={{'--pc':player.c,'--pg':player.g}} onClick={()=>setOpen(true)}>＋</button>
+    <button className="fab" onClick={()=>setOpen(true)}>+</button>
     {open&&<AddGameModal player={player} onClose={()=>setOpen(false)} onSave={onAdd}/>}
   </>;
 }
 
-// ── App ───────────────────────────────────────────────────────────────────────
 function App() {
   const [active, setActive] = useState('greg');
   const [allGames, setAllGames] = useState([]);
   const [loading, setLoading] = useState(true);
   const [toast, setToast] = useState('');
 
-  const showToast = msg=>{ setToast(msg); setTimeout(()=>setToast(''),3000); };
+  const showToast = msg=>{ setToast(msg); setTimeout(()=>setToast(''),2500); };
 
   const load = async()=>{
     const {data,error}=await sb.from('games').select('*').order('created_at',{ascending:false});
@@ -1119,8 +884,8 @@ function App() {
   },[]);
 
   useEffect(()=>{
-    const p=active==='goty'||active==='compare'
-      ? {c:'#ff2d9b',g:'linear-gradient(135deg,#ff2d9b,#cc44ff)'}
+    const p = active==='goty'||active==='compare'
+      ? {c:'#ffffff',g:'#ffffff'}
       : PLAYERS.find(p=>p.id===active);
     if(p) applyTheme(p);
   },[active]);
@@ -1129,51 +894,43 @@ function App() {
   const pg = id=>allGames.filter(g=>g.player===id);
 
   const onAdd = async g=>{
-    const {data, error}=await sb.from('games').insert([g]).select();
-    if(error) {
-      console.error('Supabase insert error:', error);
-      throw new Error(error.message || error.code || 'Insert failed');
-    }
-    showToast('✨ Game added!');
+    const {error}=await sb.from('games').insert([g]);
+    if(error) { console.error('Insert error:', error); throw new Error(error.message||'Insert failed'); }
+    showToast('Game added ✓');
     load();
   };
 
   const onUpdate = async g=>{
     const {error}=await sb.from('games').update(g).eq('id',g.id);
-    if(error) {
-      console.error('Supabase update error:', error);
-      throw new Error(error.message || 'Update failed');
-    }
-    showToast('✓ Saved!');
+    if(error) { console.error('Update error:', error); throw new Error(error.message||'Update failed'); }
+    showToast('Saved ✓');
   };
 
   const onDelete = async id=>{
-    const {error}=await sb.from('games').delete().eq('id',id);
-    if(error) console.error('Delete error:', error);
+    await sb.from('games').delete().eq('id',id);
     showToast('Removed');
   };
 
   if(loading) return <div className="loading-screen">
-    <div className="loading-logo">PLAYLOG</div>
+    <div className="loading-logo">Playlog</div>
     <div className="loading-bar"><div className="loading-fill"/></div>
-    <div style={{fontSize:11,color:'var(--text3)',letterSpacing:'0.15em',fontFamily:"'Share Tech Mono',monospace"}}>LOADING COLLECTION…</div>
   </div>;
 
   const RAIL = [
     ...PLAYERS,
-    {id:'goty',    label:'GOTY',    c:'#ff2d9b', g:'linear-gradient(135deg,#ff2d9b,#cc44ff)', emoji:'🏆'},
-    {id:'compare', label:'Compare', c:'#00d4ff', g:'linear-gradient(135deg,#00d4ff,#cc44ff)', emoji:'📊'},
+    {id:'goty',    label:'GOTY',    c:'#ffffff', g:'#ffffff', emoji:'🏆'},
+    {id:'compare', label:'Compare', c:'#ffffff', g:'#ffffff', emoji:'📊'},
   ];
 
   return <div>
     <div className="site-header">
       <div className="header-inner">
         <div className="logo-block">
-          <div className="logo-eyebrow">// Videogame Tracker //</div>
-          <div className="logo">PLAYLOG</div>
+          <div className="logo-eyebrow"></div>
+          <div className="logo">Play<span>log</span></div>
         </div>
         <div className="header-badge">
-          <div className="header-badge-name">{active==='goty'?'GOTY':active==='compare'?'ALL':cp?.label||''}</div>
+          <div className="header-badge-name">{active==='goty'?'GOTY':active==='compare'?'All':cp?.label||''}</div>
           <div className="header-badge-sub">{active==='goty'?'Awards':active==='compare'?'Players':pg(active).length+' games'}</div>
         </div>
       </div>
@@ -1182,33 +939,22 @@ function App() {
     <div className="player-rail">
       {RAIL.map(p=>(
         <button key={p.id} className={`prail-btn${active===p.id?' active':''}`} onClick={()=>setActive(p.id)}>
-          <span className="prail-dot" style={{background:p.c}}/>
+          <span className="prail-dot" style={active===p.id?{background:p.c}:{}}/>
           {p.emoji} {p.label}
         </button>
       ))}
     </div>
 
-    {active==='goty'    && <GotyView    allGames={allGames}/>}
+    {active==='goty'    && <GotyView allGames={allGames}/>}
     {active==='compare' && <CompareView allGames={allGames}/>}
-    {cp&&<PlayerView
-      key={active}
-      player={cp}
-      games={pg(active)}
-      isOwn={true}
-      onAdd={onAdd}
-      onUpdate={onUpdate}
-      onDelete={onDelete}
-    />}
-
+    {cp&&<PlayerView key={active} player={cp} games={pg(active)} isOwn={true} onAdd={onAdd} onUpdate={onUpdate} onDelete={onDelete}/>}
     {cp&&<FabAdd player={cp} onAdd={onAdd}/>}
 
     <nav className="bottom-nav">
       {RAIL.map(p=>(
-        <button key={p.id} className={`bnav-btn${active===p.id?' active':''}`}
-          onClick={()=>setActive(p.id)}
-          style={active===p.id ? {color:p.c} : {}}>
+        <button key={p.id} className={`bnav-btn${active===p.id?' active':''}`} onClick={()=>setActive(p.id)}>
           <span className="bnav-emoji">{p.emoji}</span>
-          <span className="bnav-label" style={active===p.id ? {color:p.c,textShadow:`0 0 8px ${p.c}`} : {}}>{p.label}</span>
+          <span className="bnav-label" style={active===p.id?{color:p.c}:{}}>{p.label}</span>
         </button>
       ))}
     </nav>
