@@ -12,27 +12,27 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
 :root {
-  --bg:       #0f0f0f;
-  --surface:  #1a1a1a;
-  --surface2: #222222;
-  --border:   #2a2a2a;
-  --border2:  #333333;
-  --text:     #f0f0f0;
-  --text2:    #888888;
-  --text3:    #555555;
+  --bg:       #0c0c0e;
+  --surface:  #131316;
+  --surface2: #1c1c20;
+  --border:   #242428;
+  --border2:  #2e2e34;
+  --text:     #ececec;
+  --text2:    #7a7a8a;
+  --text3:    #4a4a58;
   --white:    #ffffff;
   --accent:   #ffffff;
 
-  --greg-c: #f97316;
-  --anth-c: #a855f7;
-  --sam-c:  #3b82f6;
-  --joel-c: #22c55e;
+  --greg-c: #f472b6;
+  --anth-c: #a78bfa;
+  --sam-c:  #60a5fa;
+  --joel-c: #34d399;
 
   --pc: var(--greg-c);
   --pg: var(--greg-c);
 
-  --radius: 10px;
-  --radius-sm: 6px;
+  --radius: 12px;
+  --radius-sm: 8px;
 }
 
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -58,7 +58,7 @@ body {
 .logo {
   font-size: 18px; font-weight: 700; letter-spacing: -0.02em; color: var(--white);
 }
-.logo span { color: var(--pc); }
+.logo span { color: #f472b6; }
 .logo-eyebrow { display: none; }
 .header-badge { text-align: right; }
 .header-badge-name { font-size: 13px; font-weight: 600; color: var(--pc); display: block; }
@@ -110,7 +110,7 @@ body {
   white-space: nowrap;
 }
 .nav-tab:hover { color: var(--text); background: var(--surface2); }
-.nav-tab.active { background: var(--surface2); color: var(--white); font-weight: 600; border: 1px solid var(--border2); }
+.nav-tab.active { background: #f472b6; color: #fff; font-weight: 600; border: none; }
 
 /* ── TABS ACTIONS ── */
 .tabs-actions { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; margin-bottom: 20px; }
@@ -126,10 +126,10 @@ body {
 }
 .btn:hover { border-color: var(--text3); color: var(--white); }
 .btn-primary {
-  background: var(--white); border-color: var(--white); color: #000; font-weight: 600;
+  background: #f472b6; border-color: #f472b6; color: #fff; font-weight: 600;
 }
-.btn-primary:hover { background: #e5e5e5; border-color: #e5e5e5; color: #000; }
-.btn-danger { color: #ef4444; border-color: transparent; background: transparent; }
+.btn-primary:hover { background: #ec4899; border-color: #ec4899; color: #fff; }
+.btn-danger { color: #f87171; border-color: transparent; background: transparent; }
 .btn-danger:hover { background: rgba(239,68,68,0.1); border-color: rgba(239,68,68,0.3); }
 .btn-sm { padding: 4px 10px; font-size: 11px; }
 .btn-ghost { background: transparent; border-color: transparent; color: var(--text3); }
@@ -158,10 +158,10 @@ body {
   font-size: 10px; font-weight: 500; padding: 2px 8px; border-radius: 20px;
   background: var(--surface2); color: var(--text3); border: 1px solid var(--border);
 }
-.pill-playing { background: rgba(249,115,22,0.1); color: #f97316; border-color: rgba(249,115,22,0.2); }
-.pill-beaten  { background: rgba(34,197,94,0.1);  color: #22c55e; border-color: rgba(34,197,94,0.2); }
+.pill-playing { background: rgba(244,114,182,0.12); color: #f472b6; border-color: rgba(244,114,182,0.25); }
+.pill-beaten  { background: rgba(52,211,153,0.1);  color: #34d399; border-color: rgba(52,211,153,0.2); }
 .pill-backlog { background: var(--surface2); color: var(--text3); }
-.pill-dropped { background: rgba(239,68,68,0.1); color: #ef4444; border-color: rgba(239,68,68,0.2); }
+.pill-dropped { background: rgba(239,68,68,0.1); color: #f87171; border-color: rgba(239,68,68,0.2); }
 .game-meta { font-size: 10px; color: var(--text3); display: flex; gap: 8px; flex-wrap: wrap; }
 .game-bottom { display: flex; align-items: center; justify-content: space-between; gap: 8px; flex-wrap: wrap; margin-top: 4px; }
 .game-actions { display: flex; gap: 4px; }
@@ -237,7 +237,7 @@ body {
   cursor: pointer; transition: all 0.12s;
 }
 .fpill:hover { color: var(--text); border-color: var(--border2); }
-.fpill.active { background: var(--white); border-color: var(--white); color: #000; font-weight: 600; }
+.fpill.active { background: #f472b6; border-color: #f472b6; color: #fff; font-weight: 600; }
 
 /* ── TOP RATED ── */
 .top-item {
@@ -324,13 +324,13 @@ body {
 .loading-screen { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 60vh; gap: 20px; }
 .loading-logo { font-size: 20px; font-weight: 700; letter-spacing: -0.02em; color: var(--white); }
 .loading-bar { width: 160px; height: 2px; background: var(--border); border-radius: 1px; overflow: hidden; }
-.loading-fill { height: 100%; background: var(--white); animation: loadfill 1.5s ease infinite; border-radius: 1px; }
+.loading-fill { height: 100%; background: #f472b6; animation: loadfill 1.5s ease infinite; border-radius: 1px; }
 @keyframes loadfill { 0%{width:0;margin-left:0} 50%{width:60%;margin-left:20%} 100%{width:0;margin-left:100%} }
 .toast {
   position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%);
-  background: var(--white); color: #000; padding: 8px 18px; border-radius: 20px;
+  background: #f472b6; color: #fff; padding: 8px 18px; border-radius: 20px;
   font-size: 13px; font-weight: 600; z-index: 200;
-  box-shadow: 0 4px 24px rgba(0,0,0,0.4); animation: toastIn 0.2s ease; white-space: nowrap;
+  box-shadow: 0 4px 24px rgba(244,114,182,0.35); animation: toastIn 0.2s ease; white-space: nowrap;
 }
 @keyframes toastIn { from{opacity:0;transform:translate(-50%,6px)} to{opacity:1;transform:translate(-50%,0)} }
 
@@ -362,9 +362,9 @@ body {
 .fab {
   position: fixed; bottom: calc(66px + env(safe-area-inset-bottom, 0px)); right: 20px; z-index: 49;
   width: 48px; height: 48px; border-radius: 50%;
-  background: var(--white); border: none; cursor: pointer;
-  display: flex; align-items: center; justify-content: center; font-size: 22px; color: #000;
-  box-shadow: 0 4px 16px rgba(0,0,0,0.4); transition: all 0.15s;
+  background: #f472b6; border: none; cursor: pointer;
+  display: flex; align-items: center; justify-content: center; font-size: 22px; color: #fff;
+  box-shadow: 0 4px 20px rgba(244,114,182,0.4); transition: all 0.15s;
 }
 .fab:hover { transform: scale(1.06); }
 .fab:active { transform: scale(0.95); }
@@ -459,10 +459,10 @@ const SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsI
 const sb = window.supabase.createClient(SUPA_URL, SUPA_KEY);
 
 const PLAYERS = [
-  { id:'greg', label:'Greg', c:'#f97316', g:'#f97316', emoji:'🎮' },
-  { id:'anth', label:'Anth', c:'#a855f7', g:'#a855f7', emoji:'🕹️' },
-  { id:'sam',  label:'Sam',  c:'#3b82f6', g:'#3b82f6', emoji:'⚡' },
-  { id:'joel', label:'Joel', c:'#22c55e', g:'#22c55e', emoji:'🔥' },
+  { id:'greg', label:'Greg', c:'#f472b6', g:'#f472b6', emoji:'🎮' },
+  { id:'anth', label:'Anth', c:'#a78bfa', g:'#a78bfa', emoji:'🕹️' },
+  { id:'sam',  label:'Sam',  c:'#60a5fa', g:'#60a5fa', emoji:'⚡' },
+  { id:'joel', label:'Joel', c:'#34d399', g:'#34d399', emoji:'🔥' },
 ];
 const GENRES=['Action','Adventure','RPG','Strategy','Puzzle','Platformer','Shooter','Sports','Horror','Simulation','Fighting','Racing','Indie','Visual Novel','Other'];
 const PLATFORMS=['PC','PlayStation 5','PlayStation 4','Xbox Series X','Xbox One','Nintendo Switch','Mobile','Other'];
@@ -610,7 +610,7 @@ function AddGameModal({player, onSave, onClose, editGame}) {
         <textarea className="form-txta" rows={2} value={f.notes} onChange={e=>U('notes',e.target.value)} placeholder="Any thoughts…"/>
       </div>
     </div>
-    {saveError&&<div style={{color:'#ef4444',fontSize:12,marginTop:8}}>⚠ {saveError}</div>}
+    {saveError&&<div style={{color:'#f87171',fontSize:12,marginTop:8}}>⚠ {saveError}</div>}
     <div className="modal-actions">
       <button className="btn btn-ghost" onClick={onClose}>Cancel</button>
       <button className="btn btn-primary" onClick={handleSave} disabled={saving}>
