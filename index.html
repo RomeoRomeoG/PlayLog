@@ -5,66 +5,77 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>PLAYLOG</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;700;900&family=Share+Tech+Mono&family=Rajdhani:wght@400;500;600;700&display=swap" rel="stylesheet">
 <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
 <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
 <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
-/* ── Y2K Tech Dark System ─────────────────────────────────────────────────── */
-:root {
-  /* Deep space base */
-  --void:    #03050a;
-  --space:   #070b14;
-  --deep:    #0a1020;
-  --panel:   #0d1628;
-  --lift:    #111e38;
-  --raised:  #162544;
+/* ── Y2K XBOX RETROWAVE ───────────────────────────────────────────────────── */
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;700;900&family=Share+Tech+Mono&family=Rajdhani:wght@400;500;600;700&display=swap');
 
-  /* Plastic/translucent surfaces */
-  --glass:   rgba(20, 40, 80, 0.55);
-  --glass2:  rgba(30, 55, 110, 0.45);
-  --frost:   rgba(100, 160, 255, 0.07);
-  --frost2:  rgba(100, 160, 255, 0.13);
+:root {
+  /* Xbox dark chassis */
+  --void:    #010402;
+  --space:   #050a05;
+  --deep:    #080f08;
+  --panel:   #0c140c;
+  --lift:    #101a10;
+  --raised:  #162016;
+
+  /* Plastic translucent green tint */
+  --glass:   rgba(0, 30, 0, 0.7);
+  --glass2:  rgba(0, 40, 5, 0.8);
+  --frost:   rgba(0, 255, 80, 0.05);
+  --frost2:  rgba(0, 255, 80, 0.1);
 
   /* Text */
-  --text:    #c8deff;
-  --text2:   #7a9acc;
-  --text3:   #3d5a88;
-  --white:   #e8f2ff;
+  --text:    #b8e8b8;
+  --text2:   #6aaa6a;
+  --text3:   #2e5a2e;
+  --white:   #e0ffe0;
 
-  /* Borders */
-  --b1:      rgba(100,160,255,0.12);
-  --b2:      rgba(100,160,255,0.22);
-  --b3:      rgba(100,160,255,0.38);
-  --bhi:     rgba(100,160,255,0.6);
+  /* Borders — green tint */
+  --b1:      rgba(0,220,60,0.1);
+  --b2:      rgba(0,220,60,0.2);
+  --b3:      rgba(0,220,60,0.38);
+  --bhi:     rgba(0,220,60,0.65);
 
-  /* Accent neons */
-  --cyan:    #00d4ff;
-  --cyan2:   #0094cc;
-  --green:   #00ff9d;
-  --green2:  #00cc7a;
-  --orange:  #ff6b00;
-  --pink:    #ff2d78;
+  /* Xbox green accents */
+  --xgreen:  #00e060;
+  --xgreen2: #00b840;
+  --xglow:   rgba(0,224,96,0.35);
+  --cyan:    #00ffaa;
+  --green:   #00e060;
+  --green2:  #00b840;
+  --orange:  #ff8c00;
+  --pink:    #ff1a6e;
   --yellow:  #ffe000;
 
-  /* Player colours */
-  --greg-c: #ff6b00; --greg-g: linear-gradient(135deg,#ff6b00,#ff2d78);
-  --anth-c: #bf00ff; --anth-g: linear-gradient(135deg,#bf00ff,#7700cc);
-  --sam-c:  #00d4ff; --sam-g:  linear-gradient(135deg,#00d4ff,#0066ff);
-  --joel-c: #00ff9d; --joel-g: linear-gradient(135deg,#00ff9d,#00cc44);
+  /* Player colours — Xbox era palette */
+  --greg-c: #00e060; --greg-g: linear-gradient(135deg,#00e060,#00ff99);
+  --anth-c: #00aaff; --anth-g: linear-gradient(135deg,#00aaff,#0055ff);
+  --sam-c:  #ff8c00; --sam-g:  linear-gradient(135deg,#ff8c00,#ffcc00);
+  --joel-c: #cc00ff; --joel-g: linear-gradient(135deg,#cc00ff,#7700cc);
 
-  --pc: var(--greg-c);
-  --pg: var(--greg-g);
+  --pc: var(--xgreen);
+  --pg: linear-gradient(135deg,#00e060,#00ff99);
 
-  /* Scan line + plastic texture */
+  /* CRT scanlines */
   --scanline: repeating-linear-gradient(
     0deg,
     transparent,
     transparent 2px,
-    rgba(0,0,0,0.18) 2px,
-    rgba(0,0,0,0.18) 4px
+    rgba(0,0,0,0.25) 2px,
+    rgba(0,0,0,0.25) 4px
   );
+
+  /* Xbox dashboard chrome */
+  --chrome-grad: linear-gradient(180deg, #d0ffd0 0%, #70cc70 40%, #009030 70%, #004020 100%);
+  --chrome-bright: #c0ffc0;
+  --chrome-light: #80dd80;
+  --chrome-steel: #3a7a3a;
+  --chrome-silver: #609060;
 }
 
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -72,22 +83,34 @@
 body {
   background: var(--void);
   color: var(--text);
-  font-family: 'Space Grotesk', sans-serif;
+  font-family: 'Rajdhani', sans-serif;
   font-size: 16px;
   font-weight: 400;
   min-height: 100vh;
   overflow-x: hidden;
 }
 
-/* Deep space starfield glow */
+/* Xbox dashboard ambient glow */
 body::before {
   content: '';
   position: fixed;
   inset: 0;
   background:
-    radial-gradient(ellipse 80% 50% at 20% 10%, rgba(0,100,255,0.06) 0%, transparent 60%),
-    radial-gradient(ellipse 60% 40% at 80% 80%, rgba(0,212,255,0.05) 0%, transparent 50%),
-    radial-gradient(ellipse 40% 30% at 60% 30%, rgba(191,0,255,0.04) 0%, transparent 50%);
+    radial-gradient(ellipse 70% 40% at 15% 15%, rgba(0,180,50,0.08) 0%, transparent 60%),
+    radial-gradient(ellipse 50% 35% at 85% 75%, rgba(0,120,30,0.06) 0%, transparent 50%),
+    radial-gradient(ellipse 60% 60% at 50% 50%, rgba(0,40,0,0.5) 0%, transparent 70%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* CRT phosphor grid overlay */
+body::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image:
+    repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,0.15) 2px, rgba(0,0,0,0.15) 4px),
+    repeating-linear-gradient(90deg, transparent, transparent 3px, rgba(0,40,0,0.04) 3px, rgba(0,40,0,0.04) 4px);
   pointer-events: none;
   z-index: 0;
 }
@@ -109,82 +132,91 @@ body::before {
   content: '';
   position: absolute;
   bottom: -1px; left: 0;
-  width: 120px; height: 1px;
-  background: var(--pc);
-  box-shadow: 0 0 12px var(--pc);
+  width: 180px; height: 2px;
+  background: linear-gradient(90deg, var(--xgreen), transparent);
+  box-shadow: 0 0 16px var(--xgreen);
 }
 .logo-eyebrow {
   font-family: 'Share Tech Mono', monospace;
   font-size: 9px;
-  letter-spacing: 0.3em;
+  letter-spacing: 0.4em;
   text-transform: uppercase;
   color: var(--text3);
   margin-bottom: 6px;
 }
 .logo {
-  font-family: 'Space Grotesk', sans-serif;
+  font-family: 'Orbitron', sans-serif;
   font-size: 3rem;
-  font-weight: 700;
-  letter-spacing: -0.02em;
+  font-weight: 900;
+  letter-spacing: 0.08em;
   line-height: 1;
   color: var(--white);
-  text-shadow: 0 0 40px rgba(0,180,255,0.3);
+  text-shadow: 0 0 30px var(--xgreen), 0 0 60px rgba(0,224,96,0.2);
   position: relative;
 }
 .logo::after {
   content: 'PLAYLOG';
   position: absolute;
   inset: 0;
-  background: var(--pg);
+  background: var(--chrome-grad);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
-  opacity: 0.85;
+  opacity: 0.9;
 }
 .header-badge { text-align: right; }
 .header-badge-name {
-  font-family: 'Share Tech Mono', monospace;
-  font-size: 1rem;
-  letter-spacing: 0.08em;
+  font-family: 'Orbitron', sans-serif;
+  font-size: 0.9rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
   color: var(--pc);
-  text-shadow: 0 0 10px var(--pc);
+  text-shadow: 0 0 12px var(--pc);
   display: block;
 }
 .header-badge-sub {
   font-size: 10px;
   font-family: 'Share Tech Mono', monospace;
-  letter-spacing: 0.12em;
+  letter-spacing: 0.15em;
   color: var(--text3);
 }
 
 /* ── PLAYER RAIL ─────────────────────────────────────────────────────────── */
 .player-rail {
   display: flex;
-  gap: 2px;
+  gap: 3px;
   background: var(--glass);
-  backdrop-filter: blur(16px) saturate(1.5);
   border: 1px solid var(--b2);
-  border-radius: 8px;
+  border-radius: 4px;
   padding: 4px;
   margin-bottom: 2rem;
   overflow-x: auto;
   scrollbar-width: none;
   box-shadow:
     0 0 0 1px var(--b1) inset,
-    0 4px 24px rgba(0,0,0,0.5),
-    inset 0 1px 0 rgba(255,255,255,0.06);
-  /* plastic scan effect */
+    0 4px 24px rgba(0,0,0,0.7),
+    inset 0 1px 0 rgba(0,255,80,0.06);
   background-image: var(--scanline);
   background-color: var(--glass);
+  position: relative;
+}
+/* Xbox green corner accent */
+.player-rail::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0;
+  width: 4px; height: 100%;
+  background: linear-gradient(180deg, var(--xgreen), transparent);
+  border-radius: 4px 0 0 4px;
 }
 .player-rail::-webkit-scrollbar { display: none; }
 .prail-btn {
-  font-family: 'Space Grotesk', sans-serif;
-  font-size: 12px;
+  font-family: 'Orbitron', sans-serif;
+  font-size: 11px;
   font-weight: 600;
-  letter-spacing: 0.04em;
+  letter-spacing: 0.08em;
   padding: 0.5rem 1.1rem;
-  border-radius: 5px;
+  border-radius: 3px;
   border: none;
   background: transparent;
   color: var(--text3);
@@ -195,29 +227,99 @@ body::before {
   align-items: center;
   gap: 0.4rem;
   flex-shrink: 0;
+  text-transform: uppercase;
 }
 .prail-btn:hover { color: var(--text2); background: var(--frost2); }
 .prail-btn.active {
   background: var(--pg);
-  color: #fff;
-  box-shadow: 0 0 16px var(--pc), 0 2px 8px rgba(0,0,0,0.4);
-  text-shadow: 0 0 8px rgba(255,255,255,0.4);
+  color: #000;
+  font-weight: 700;
+  box-shadow: 0 0 20px var(--pc), 0 2px 8px rgba(0,0,0,0.6);
+  text-shadow: none;
 }
 .prail-dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
 .prail-btn:not(.active) .prail-dot { background: var(--text3); }
-.prail-btn.active .prail-dot { background: rgba(255,255,255,0.8); box-shadow: 0 0 4px #fff; }
+.prail-btn.active .prail-dot { background: #000; box-shadow: 0 0 4px rgba(0,0,0,0.5); }
 
 /* ── STAT CARDS ──────────────────────────────────────────────────────────── */
 .stat-row { display: grid; grid-template-columns: repeat(auto-fit,minmax(100px,1fr)); gap: 6px; margin-bottom: 1.75rem; }
 .stat-card {
   background: var(--glass);
-  backdrop-filter: blur(16px) saturate(1.4);
   border: 1px solid var(--b2);
-  border-radius: 6px;
+  border-radius: 4px;
   padding: 1rem 0.875rem;
   text-align: center;
   position: relative;
   overflow: hidden;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.6), inset 0 1px 0 rgba(0,255,80,0.06);
+  background-image: var(--scanline);
+  background-color: var(--glass);
+  clip-path: polygon(0 0, calc(100% - 10px) 0, 100% 10px, 100% 100%, 10px 100%, 0 calc(100% - 10px));
+}
+.stat-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 2px;
+  background: var(--pg);
+  box-shadow: 0 0 10px var(--pc);
+}
+.stat-num {
+  font-family: 'Orbitron', sans-serif;
+  font-size: 2rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  color: var(--pc);
+  text-shadow: 0 0 20px var(--pc);
+  line-height: 1;
+  margin-bottom: 4px;
+}
+.stat-lbl {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 8px;
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+  color: var(--text3);
+}
+
+/* ── NAV TABS ────────────────────────────────────────────────────────────── */
+.nav-tabs {
+  display: flex;
+  gap: 2px;
+  background: var(--glass);
+  border: 1px solid var(--b2);
+  border-radius: 4px;
+  padding: 3px;
+  margin-bottom: 1.5rem;
+  overflow-x: auto;
+  scrollbar-width: none;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.5), inset 0 1px 0 rgba(0,255,80,0.04);
+  background-image: var(--scanline);
+  background-color: var(--glass);
+}
+.nav-tabs::-webkit-scrollbar { display: none; }
+.nav-tab {
+  font-family: 'Orbitron', sans-serif;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  padding: 0.4rem 0.9rem;
+  border-radius: 3px;
+  border: none;
+  background: transparent;
+  color: var(--text3);
+  cursor: pointer;
+  transition: all 0.15s;
+  white-space: nowrap;
+  text-transform: uppercase;
+}
+.nav-tab:hover { color: var(--text2); background: var(--frost); }
+.nav-tab.active {
+  background: var(--pg);
+  color: #000;
+  font-weight: 700;
+  box-shadow: 0 0 14px var(--pc);
+}
   box-shadow: 0 4px 16px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.05);
   background-image: var(--scanline);
   background-color: var(--glass);
@@ -288,15 +390,14 @@ body::before {
 
 /* ── BUTTONS ─────────────────────────────────────────────────────────────── */
 .btn {
-  font-family: 'Space Grotesk', sans-serif;
-  font-size: 11px;
-  font-weight: 600;
-  letter-spacing: 0.04em;
+  font-family: 'Orbitron', sans-serif;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
   padding: 0.45rem 1rem;
-  border-radius: 5px;
+  border-radius: 3px;
   border: 1px solid var(--b2);
   background: var(--glass);
-  backdrop-filter: blur(8px);
   color: var(--text2);
   cursor: pointer;
   transition: all 0.15s;
@@ -304,21 +405,22 @@ body::before {
   align-items: center;
   gap: 0.3rem;
   white-space: nowrap;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.04);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.5), inset 0 1px 0 rgba(0,255,80,0.04);
+  text-transform: uppercase;
 }
-.btn:hover { border-color: var(--b3); color: var(--text); background: var(--frost2); }
+.btn:hover { border-color: var(--b3); color: var(--text); background: var(--frost2); box-shadow: 0 0 10px var(--xglow); }
 .btn-primary {
   background: var(--pg);
   border-color: transparent;
-  color: #fff;
-  font-weight: 700;
-  box-shadow: 0 0 20px var(--pc), 0 4px 16px rgba(0,0,0,0.4);
-  text-shadow: 0 0 8px rgba(255,255,255,0.3);
+  color: #000;
+  font-weight: 900;
+  box-shadow: 0 0 24px var(--pc), 0 4px 16px rgba(0,0,0,0.5);
+  text-shadow: none;
 }
-.btn-primary:hover { filter: brightness(1.15); transform: translateY(-1px); box-shadow: 0 0 28px var(--pc), 0 6px 20px rgba(0,0,0,0.4); }
-.btn-danger { color: var(--pink); border-color: rgba(255,45,120,0.25); background: rgba(255,45,120,0.06); }
-.btn-danger:hover { background: rgba(255,45,120,0.14); border-color: var(--pink); box-shadow: 0 0 10px rgba(255,45,120,0.3); }
-.btn-sm { padding: 0.25rem 0.6rem; font-size: 10px; }
+.btn-primary:hover { filter: brightness(1.2); transform: translateY(-1px); box-shadow: 0 0 32px var(--pc), 0 6px 20px rgba(0,0,0,0.5); }
+.btn-danger { color: var(--pink); border-color: rgba(255,26,110,0.25); background: rgba(255,26,110,0.06); }
+.btn-danger:hover { background: rgba(255,26,110,0.14); border-color: var(--pink); box-shadow: 0 0 10px rgba(255,26,110,0.3); }
+.btn-sm { padding: 0.25rem 0.6rem; font-size: 9px; }
 .btn-ghost { background: transparent; border-color: transparent; color: var(--text3); box-shadow: none; }
 .btn-ghost:hover { color: var(--text2); background: var(--frost); border-color: transparent; }
 
@@ -357,9 +459,9 @@ body::before {
 .cover-spin { width: 16px; height: 16px; border: 2px solid var(--b2); border-top-color: var(--cyan); border-radius: 50%; animation: spin 0.7s linear infinite; }
 .game-body { padding: 0.875rem 1rem; flex: 1; min-width: 0; display: flex; flex-direction: column; justify-content: space-between; }
 .game-title {
-  font-family: 'Space Grotesk', sans-serif;
-  font-weight: 700; font-size: 14px; color: var(--white);
-  line-height: 1.2; margin-bottom: 0.4rem; letter-spacing: -0.01em;
+  font-family: 'Rajdhani', sans-serif;
+  font-weight: 700; font-size: 15px; color: var(--white);
+  line-height: 1.2; margin-bottom: 0.4rem; letter-spacing: 0.02em;
 }
 .game-pills { display: flex; gap: 0.3rem; flex-wrap: wrap; margin-bottom: 0.4rem; align-items: center; }
 .pill {
@@ -418,9 +520,9 @@ body::before {
   border-radius: 10px 10px 0 0;
 }
 .modal-title {
-  font-family: 'Space Grotesk', sans-serif;
-  font-size: 1.5rem; font-weight: 700; letter-spacing: -0.02em;
-  color: var(--white); margin-bottom: 1.5rem;
+  font-family: 'Orbitron', sans-serif;
+  font-size: 1.2rem; font-weight: 700; letter-spacing: 0.08em;
+  color: var(--white); margin-bottom: 1.5rem; text-transform: uppercase;
 }
 .modal-close {
   position: absolute; top: 1.1rem; right: 1.1rem;
@@ -440,19 +542,19 @@ body::before {
   font-size: 9px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--text3);
 }
 .form-inp, .form-sel, .form-txta {
-  background: rgba(0,10,30,0.6);
+  background: rgba(0,10,0,0.7);
   border: 1px solid var(--b2);
-  border-radius: 5px;
+  border-radius: 3px;
   padding: 0.55rem 0.75rem;
-  font-family: 'Space Grotesk', sans-serif;
-  font-size: 13px; color: var(--text);
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 14px; font-weight: 500; color: var(--text);
   outline: none; width: 100%;
   transition: border-color 0.15s, box-shadow 0.15s;
   -webkit-appearance: none;
 }
 .form-inp:focus, .form-sel:focus {
   border-color: var(--pc);
-  box-shadow: 0 0 0 2px rgba(0,180,255,0.12), 0 0 12px var(--pc);
+  box-shadow: 0 0 0 2px rgba(0,224,96,0.1), 0 0 14px var(--xglow);
 }
 .form-inp::placeholder { color: var(--text3); }
 .form-sel { cursor: pointer; color-scheme: dark; }
@@ -523,9 +625,9 @@ body::before {
 /* ── GOTY ────────────────────────────────────────────────────────────────── */
 .goty-hero { text-align: center; padding: 2rem 0 2.5rem; }
 .goty-title {
-  font-family: 'Share Tech Mono', monospace;
-  font-size: 3rem; letter-spacing: 0.15em;
-  color: var(--cyan); text-shadow: 0 0 30px var(--cyan), 0 0 60px rgba(0,212,255,0.3);
+  font-family: 'Orbitron', sans-serif;
+  font-size: 3rem; font-weight: 900; letter-spacing: 0.15em;
+  color: var(--xgreen); text-shadow: 0 0 30px var(--xgreen), 0 0 60px rgba(0,224,96,0.3);
   line-height: 1; margin-bottom: 0.5rem;
 }
 .goty-sub {
@@ -554,8 +656,8 @@ body::before {
 .goty-winner-info { flex: 1; min-width: 0; }
 .goty-crown { font-size: 1.5rem; margin-bottom: 4px; display: block; }
 .goty-winner-title {
-  font-family: 'Space Grotesk', sans-serif;
-  font-size: 1.5rem; font-weight: 700; letter-spacing: -0.02em;
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 1.5rem; font-weight: 700; letter-spacing: 0.02em;
   color: var(--white); line-height: 1.1; margin-bottom: 6px;
 }
 .goty-winner-meta { font-family: 'Share Tech Mono', monospace; font-size: 10px; letter-spacing: 0.06em; color: var(--text3); margin-bottom: 8px; }
@@ -628,9 +730,9 @@ body::before {
 /* ── LOADING / TOAST ─────────────────────────────────────────────────────── */
 .loading-screen { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 60vh; gap: 1.25rem; }
 .loading-logo {
-  font-family: 'Share Tech Mono', monospace;
-  font-size: 2.5rem; letter-spacing: 0.25em;
-  color: var(--cyan); text-shadow: 0 0 30px var(--cyan), 0 0 60px rgba(0,212,255,0.3);
+  font-family: 'Orbitron', sans-serif;
+  font-size: 2.5rem; font-weight: 900; letter-spacing: 0.25em;
+  color: var(--xgreen); text-shadow: 0 0 30px var(--xgreen), 0 0 60px rgba(0,224,96,0.3);
 }
 .loading-bar { width: 200px; height: 2px; background: var(--b1); border-radius: 1px; overflow: hidden; }
 .loading-fill { height: 100%; background: var(--pg); box-shadow: 0 0 8px var(--pc); animation: loadfill 1.5s ease infinite; border-radius: 1px; }
@@ -1020,12 +1122,19 @@ function AddGameModal({player, onSave, onClose, editGame}) {
         if(!f.title.trim()) return;
         setSaving(true);
         try {
-          await onSave({...f, id:(editGame && editGame.id)||uid(), title:f.title.trim(), cover_url:selCover, player:player.id});
+          const gameData = {...f, title:f.title.trim(), cover_url:selCover, player:player.id};
+          if(!editGame) {
+            // INSERT — do NOT include id, let Supabase generate it
+            delete gameData.id;
+          } else {
+            gameData.id = editGame.id;
+          }
+          await onSave(gameData);
           onClose();
         } catch(e) {
+          console.error('Save error:', e);
           setSaving(false);
         }
-        setSaving(false);
       }} disabled={saving}>{saving?'Saving…':editGame?'Save Changes':'Add to Log'}</button>
     </div>
   </Modal>;
